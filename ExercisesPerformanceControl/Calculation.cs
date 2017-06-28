@@ -35,6 +35,8 @@ namespace ExercisesPerformanceControl
             Joint joint0 = skel.Joints[type0];
             Joint joint1 = skel.Joints[type1];
             Joint joint2 = skel.Joints[type2];
+			
+			// Just a comment
 
             double angle = 0;
 
