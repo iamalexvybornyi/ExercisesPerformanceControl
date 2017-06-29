@@ -15,6 +15,7 @@ using System.Windows.Shapes;
 using Microsoft.Kinect;
 using System.IO;
 using System.Windows.Threading;
+using System.Globalization;
 
 namespace ExercisesPerformanceControl
 {
@@ -57,7 +58,7 @@ namespace ExercisesPerformanceControl
         /// <summary>
         /// Name of an exercise
         /// </summary>
-        public string ExText = "Ex1";
+        public string ExText = "";
 
         /// <summary>
         /// List for skeleton data
@@ -275,9 +276,16 @@ namespace ExercisesPerformanceControl
 
             _gesture.GestureRecognized += Gesture_GestureRecognized;
 
+            ExText = "Ex3";
+
             // Get all the skeleton data of an exercise
             skelList = FileRW.ReadSkelDataFromFile(ExText);
-            skelListUser = FileRW.ReadSkelDataFromFile(ExText);
+
+            string userInput = "Input3";
+            skelListUser = FileRW.ReadSkelDataFromFile(userInput);
+
+            frames = skelList.Count;
+            framesUserData = skelListUser.Count;
 
             // Check if the files were read correctly
             if (skelList.Count() == 0)
@@ -287,9 +295,7 @@ namespace ExercisesPerformanceControl
             }
             else
             {
-                frames = skelList.Count;
-                framesUserData = skelListUser.Count;
-                //foreach (var skel in skelList)
+                //foreach (var skel in skelListUser)
                 //{
                 //    List<Point> tmpList = new List<Point>();
                 //    foreach (Joint joint in skel.Joints)
@@ -299,21 +305,21 @@ namespace ExercisesPerformanceControl
                 //    pointsList.Add(tmpList);
                 //}
 
-                //string fileLocation = "Ex1.pnt";
+                //string fileLocation = userInput + ".pnt";
                 //FileRW.WritePointsDataToFile(pointsList, fileLocation);
             }
 
             pointsList.Clear();
-            pointsList = FileRW.ReadPointsDataFromFile("Ex1");
+            pointsList = FileRW.ReadPointsDataFromFile(ExText);
 
             pointsListUser.Clear();
-            pointsListUser = FileRW.ReadPointsDataFromFile("Ex1");
+            pointsListUser = FileRW.ReadPointsDataFromFile(userInput);
 
             timerForReferenceMovement.Tick += new EventHandler(dispatcherTimer_TickReferenceMovement);
-            timerForReferenceMovement.Interval = new TimeSpan(0, 0, 0, 0, 33);
+            timerForReferenceMovement.Interval = new TimeSpan(0, 0, 0, 0, 35);
 
             timerForUserData.Tick += new EventHandler(dispatcherTimer_TickUserMovement);
-            timerForUserData.Interval = new TimeSpan(0, 0, 0, 0, 15);
+            timerForUserData.Interval = new TimeSpan(0, 0, 0, 0, 35);
 
             timerForReferenceMovement.Start();
             if (sensor == null)
@@ -375,7 +381,7 @@ namespace ExercisesPerformanceControl
                     if (skelListUser[indexUserData].TrackingState == SkeletonTrackingState.Tracked)
                     {
                         this.DrawBonesAndJointsForRecordedDataUser(skelListUser[indexUserData], dc2);
-                        _gesture.Update(skelListUser[indexUserData]);
+                        _gesture.Update(skelListUser[indexUserData], skelList);
                     }
                     else if (skelListUser[indexUserData].TrackingState == SkeletonTrackingState.PositionOnly)
                     {
@@ -517,22 +523,22 @@ namespace ExercisesPerformanceControl
 
                             this.DrawBonesAndJoints(skel, dc);
 
-                            _gesture.Update(skel);
+                            _gesture.Update(skel, skelList);
 
                             // All these commented lines below were used to record exercises. That's why they're still here.
-                            /*
+                            
                             //Write skeleton data of an exercise to file
-                            if (skelListForRecording.Count() < 150)
-                            {
-                                skelListForRecording.Add(skel);
-                            }
-                            else if (Written == false)
-                            {
-                                string fileLocation = "C:\\Users\\Александр\\Documents\\Visual Studio 2013\\Projects\\SkeletonTracking\\" + outputName + ".txt";
-                                FileRW.WriteSkelDataToFile(skelListForRecording, fileLocation);
-                                Written = true;
-                            }
-                            */
+                            //if (skelListForRecording.Count() < 250)
+                            //{
+                            //    skelListForRecording.Add(skel);
+                            //}
+                            //else if (Written == false)
+                            //{
+                            //    string fileLocation = "Input3.txt";
+                            //    FileRW.WriteSkelDataToFile(skelListForRecording, fileLocation);
+                            //    Written = true;
+                            //}
+                            
                         }
                         else if (skel.TrackingState == SkeletonTrackingState.PositionOnly && currentlyTrackedSkeletonId == skel.TrackingId)
                         {
@@ -587,11 +593,21 @@ namespace ExercisesPerformanceControl
             this.DrawBoneForRecordedData(skeleton, drawingContext, JointType.KneeRight, JointType.AnkleRight, 17, 18);
             this.DrawBoneForRecordedData(skeleton, drawingContext, JointType.AnkleRight, JointType.FootRight, 18, 19);
 
+            int counter = 0;
             foreach (var point in pointsList[index])
             {
                 Brush drawBrush = this.trackedJointBrush;
                 drawingContext.DrawEllipse(drawBrush, null, point, JointThickness, JointThickness);
+
+                if (counter == 4)
+                {
+                    double angle = Calculation.getAngle(skelList[index], JointType.ShoulderCenter, JointType.ShoulderLeft, JointType.ElbowLeft);
+                    FormattedText formattedText = new FormattedText(String.Format("{0:0.00}", angle), CultureInfo.GetCultureInfo("en-us"), FlowDirection.LeftToRight, new Typeface("Verdana"), 32, Brushes.Black);
+                    drawingContext.DrawText(formattedText, point);
+                }
+
                 JointThickness = 3;
+                counter++;
             }
         }
 
@@ -631,11 +647,21 @@ namespace ExercisesPerformanceControl
             this.DrawBoneForRecordedDataUser(skeleton, drawingContext, JointType.KneeRight, JointType.AnkleRight, 17, 18);
             this.DrawBoneForRecordedDataUser(skeleton, drawingContext, JointType.AnkleRight, JointType.FootRight, 18, 19);
 
+            int counter = 0;
             foreach (var point in pointsListUser[indexUserData])
             {
                 Brush drawBrush = this.trackedJointBrush;
                 drawingContext.DrawEllipse(drawBrush, null, point, JointThickness, JointThickness);
                 JointThickness = 3;
+
+                if (counter == 4)
+                {
+                    double angle = Calculation.getAngle(skelListUser[indexUserData], JointType.ShoulderCenter, JointType.ShoulderLeft, JointType.ElbowLeft);
+                    FormattedText formattedText = new FormattedText(String.Format("{0:0.00}", angle), CultureInfo.GetCultureInfo("en-us"), FlowDirection.LeftToRight, new Typeface("Verdana"), 32, Brushes.Black);
+                    drawingContext.DrawText(formattedText, point);
+                }
+
+                counter++;
             }
         }
 
@@ -693,6 +719,13 @@ namespace ExercisesPerformanceControl
                 {
                     drawingContext.DrawEllipse(drawBrush, null, this.SkeletonPointToScreen(joint.Position), JointThickness, JointThickness);
                     JointThickness = 3;
+
+                    if (joint.JointType == JointType.ShoulderLeft)
+                    {
+                        double angle = Calculation.getAngle(skeleton, JointType.ShoulderCenter, JointType.ShoulderLeft, JointType.ElbowLeft);
+                        FormattedText formattedText = new FormattedText(String.Format("{0:0.00}", angle), CultureInfo.GetCultureInfo("en-us"), FlowDirection.LeftToRight, new Typeface("Verdana"), 32, Brushes.Black);
+                        drawingContext.DrawText(formattedText, this.SkeletonPointToScreen(joint.Position));
+                    }
                 }
             }
         }

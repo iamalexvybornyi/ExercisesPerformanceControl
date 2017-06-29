@@ -18,88 +18,88 @@ namespace ExercisesPerformanceControl
     class AnglesStorage
     {
         /// <summary>
-        /// List for right shoulder
+        /// Angle in right shoulder
         /// <summary>
-        public List<double> anglesListForRightShoulder;
+        public double angleInRightShoulder;
 
         /// <summary>
-        /// List for left shoulder
+        /// Angle in left shoulder
         /// <summary>
-        public List<double> anglesListForLeftShoulder;
+        public double angleInLeftShoulder;
 
         /// <summary>
-        /// List for right elbow
+        /// Angle in right elbow
         /// <summary>
-        public List<double> anglesListForRightElbow;
+        public double angleInRightElbow;
 
         /// <summary>
-        /// List for left elbow
+        /// Angle in left elbow
         /// <summary>
-        public List<double> anglesListForLeftElbow;
+        public double angleInLeftElbow;
 
         /// <summary>
-        /// List for right hip
+        /// Angle in right hip
         /// <summary>
-        public List<double> anglesListForRightHip;
+        public double angleInRightHip;
 
         /// <summary>
-        /// List for left hip
+        /// Angle in left hip
         /// <summary>
-        public List<double> anglesListForLeftHip;
+        public double angleInLeftHip;
 
         /// <summary>
-        /// List for hip center right
+        /// Angle in hip center right
         /// <summary>
-        public List<double> anglesListForHipCenterRight;
+        public double angleInHipCenterRight;
 
         /// <summary>
-        /// List for hip center left
+        /// Angle in hip center left
         /// <summary>
-        public List<double> anglesListForHipCenterLeft;
+        public double angleInHipCenterLeft;
 
         /// <summary>
-        /// List for spine
+        /// Angle in spine
         /// <summary>
-        public List<double> anglesListForSpine;
+        public double angleInSpine;
 
         /// <summary>
-        /// List for right knee
+        /// Angle in right knee
         /// <summary>
-        public List<double> anglesListForRightKnee;
+        public double angleInRightKnee;
 
         /// <summary>
-        /// List for left knee
+        /// Angle in left knee
         /// <summary>
-        public List<double> anglesListForLeftKnee;
+        public double angleInLeftKnee;
 
         /// <summary>
-        /// List for right ankle
+        /// Angle in right ankle
         /// <summary>
-        public List<double> anglesListForRightAnkle;
+        public double angleInRightAnkle;
 
         /// <summary>
-        /// List for left ankle
+        /// Angle in left ankle
         /// <summary>
-        public List<double> anglesListForLeftAnkle;
+        public double angleInLeftAnkle;
 
         /// <summary>
         /// Initializes a new instance of the AnglesStorage class.
         /// </summary>
         public AnglesStorage()
         {
-            anglesListForRightShoulder = new List<double>();
-            anglesListForLeftShoulder = new List<double>();
-            anglesListForRightElbow = new List<double>();
-            anglesListForLeftElbow = new List<double>();
-            anglesListForRightHip = new List<double>();
-            anglesListForLeftHip = new List<double>();
-            anglesListForHipCenterRight = new List<double>();
-            anglesListForHipCenterLeft = new List<double>();
-            anglesListForSpine = new List<double>();
-            anglesListForRightKnee = new List<double>();
-            anglesListForLeftKnee = new List<double>();
-            anglesListForRightAnkle = new List<double>();
-            anglesListForLeftAnkle = new List<double>();
+            angleInRightShoulder = new double();
+            angleInLeftShoulder = new double();
+            angleInRightElbow = new double();
+            angleInLeftElbow = new double();
+            angleInRightHip = new double();
+            angleInLeftHip = new double();
+            angleInHipCenterRight = new double();
+            angleInHipCenterLeft = new double();
+            angleInSpine = new double();
+            angleInRightKnee = new double();
+            angleInLeftKnee = new double();
+            angleInRightAnkle = new double();
+            angleInLeftAnkle = new double();
         }
     }
 }

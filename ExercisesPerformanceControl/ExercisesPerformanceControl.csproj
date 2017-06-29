@@ -64,6 +64,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="JointPosComparisonResultStorage.cs" />
+    <Compile Include="JointPositionsComparisonResult.cs" />
     <Compile Include="WaveGesture.cs" />
     <Compile Include="WaveGestureSegments.cs" />
     <Page Include="MainWindow.xaml">

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Kinect;
 using System;
+using System.Collections.Generic;
 
 namespace ExercisesPerformanceControl
 {
@@ -16,23 +17,20 @@ namespace ExercisesPerformanceControl
 
         public HandRaiseGesture()
         {
-            HandRaise1 handRaiseSegment1 = new HandRaise1();
-            HandRaise2 handRaiseSegment2 = new HandRaise2();
-            HandRaise3 handRaiseSegment3 = new HandRaise3();
-            HandRaise4 handRaiseSegment4 = new HandRaise4();
-            HandRaise5 handRaiseSegment5 = new HandRaise5();
+            HandRaise1 handRaiseSegment = new HandRaise1();
 
             _segments = new IGestureSegment[]
             {
-                handRaiseSegment1,
-                handRaiseSegment2,
-                handRaiseSegment3,
-                handRaiseSegment4,
-                handRaiseSegment5,
-                handRaiseSegment4,
-                handRaiseSegment3,
-                handRaiseSegment2,
-                handRaiseSegment1
+                handRaiseSegment,
+                handRaiseSegment,
+                handRaiseSegment,
+                handRaiseSegment,
+                handRaiseSegment,
+                handRaiseSegment,
+                handRaiseSegment,
+                handRaiseSegment,
+                handRaiseSegment,
+                handRaiseSegment
             };
         }
 
@@ -40,9 +38,12 @@ namespace ExercisesPerformanceControl
         /// Updates the current gesture.
         /// </summary>
         /// <param name="skeleton">The skeleton data.</param>
-        public void Update(Skeleton skeleton)
+        public void Update(Skeleton skeleton, List<Skeleton> skelList)
         {
-            GesturePartResult result = _segments[_currentSegment].Update(skeleton);
+            int frames = skelList.Count;
+            int frame = frames / 10;
+
+            GesturePartResult result = _segments[_currentSegment].Update(skeleton, skelList[frame * (_currentSegment + 1) - 1]);
 
             if (result == GesturePartResult.Succeeded)
             {
@@ -50,6 +51,7 @@ namespace ExercisesPerformanceControl
                 {
                     _currentSegment++;
                     _frameCount = 0;
+                    Console.WriteLine(_currentSegment);
                 }
                 else
                 {

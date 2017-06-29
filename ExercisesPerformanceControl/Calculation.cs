@@ -35,8 +35,6 @@ namespace ExercisesPerformanceControl
             Joint joint0 = skel.Joints[type0];
             Joint joint1 = skel.Joints[type1];
             Joint joint2 = skel.Joints[type2];
-			
-			// Just a comment
 
             double angle = 0;
 
@@ -61,10 +59,124 @@ namespace ExercisesPerformanceControl
 
             double sin = vec1.X * vec2.Y - vec2.X * vec1.Y;
             double cos = vec1.X * vec2.X + vec1.Y * vec2.Y;
-            
+
             //Calculate angle
             angle = Math.Atan2(sin, cos) * (180 / Math.PI);
+
+            if (angle < 0)
+            {
+                angle = 180 + (180 - Math.Abs(angle));
+            }
             return angle;
+        }
+
+        public static AnglesStorage getAnglesInSkeletonJoints(Skeleton skeleton)
+        {
+            double angle = 0;
+            AnglesStorage anglesStorage = new AnglesStorage();
+            // Get angle in right shoulder
+            angle = Calculation.getAngle(skeleton, JointType.ShoulderCenter, JointType.ShoulderRight, JointType.ElbowRight);
+            anglesStorage.angleInRightShoulder = angle;
+
+            // Get angle in left shoulder
+            angle = Calculation.getAngle(skeleton, JointType.ShoulderCenter, JointType.ShoulderLeft, JointType.ElbowLeft);
+            anglesStorage.angleInLeftShoulder = angle;
+
+            // Get angle in right elbow
+            angle = Calculation.getAngle(skeleton, JointType.ShoulderRight, JointType.ElbowRight, JointType.WristRight);
+            anglesStorage.angleInRightElbow = angle;
+
+            // Get angle in left elbow
+            angle = Calculation.getAngle(skeleton, JointType.ShoulderLeft, JointType.ElbowLeft, JointType.WristLeft);
+            anglesStorage.angleInLeftElbow = angle;
+
+            // Get angle in right hip
+            angle = Calculation.getAngle(skeleton, JointType.HipCenter, JointType.HipRight, JointType.KneeRight);
+            anglesStorage.angleInRightHip = angle;
+
+            // Get angle in left hip
+            angle = Calculation.getAngle(skeleton, JointType.HipCenter, JointType.HipLeft, JointType.KneeLeft);
+            anglesStorage.angleInLeftHip = angle;
+
+            // Get angle in hip center right
+            angle = Calculation.getAngle(skeleton, JointType.Spine, JointType.HipCenter, JointType.HipRight);
+            anglesStorage.angleInHipCenterRight = angle;
+
+            // Get angle in hip center left
+            angle = Calculation.getAngle(skeleton, JointType.Spine, JointType.HipCenter, JointType.HipLeft);
+            anglesStorage.angleInHipCenterLeft = angle;
+
+            // Get angle in spine
+            angle = Calculation.getAngle(skeleton, JointType.ShoulderCenter, JointType.Spine, JointType.HipCenter);
+            anglesStorage.angleInSpine = angle;
+
+            // Get angle in right knee
+            angle = Calculation.getAngle(skeleton, JointType.HipRight, JointType.KneeRight, JointType.AnkleRight);
+            anglesStorage.angleInRightKnee = angle;
+
+            // Get angle in left knee
+            angle = Calculation.getAngle(skeleton, JointType.HipLeft, JointType.KneeLeft, JointType.AnkleLeft);
+            anglesStorage.angleInLeftKnee = angle;
+
+            // Get angle in right ankle
+            angle = Calculation.getAngle(skeleton, JointType.KneeRight, JointType.AnkleRight, JointType.FootRight);
+            anglesStorage.angleInRightAnkle = angle;
+
+            // Get angle in left ankle
+            angle = Calculation.getAngle(skeleton, JointType.KneeLeft, JointType.AnkleLeft, JointType.FootLeft);
+            anglesStorage.angleInLeftAnkle = angle;
+
+            return anglesStorage;
+        }
+
+        public static  JointPosComparisonResultStorage ComparePositionsOfJoints(Skeleton skeleton)
+        {
+            JointPosComparisonResultStorage res = new JointPosComparisonResultStorage();
+
+            double YPosWristRight = skeleton.Joints[JointType.WristRight].Position.Y;
+            double YPosElbowRight = skeleton.Joints[JointType.ElbowRight].Position.Y;
+            double YPosWristLeft = skeleton.Joints[JointType.WristLeft].Position.Y;
+            double YPosElbowLeft = skeleton.Joints[JointType.ElbowLeft].Position.Y;
+            double YPosShoulderRight = skeleton.Joints[JointType.ShoulderRight].Position.Y;
+            double YPosShoulderLeft = skeleton.Joints[JointType.ShoulderLeft].Position.Y;
+
+            if (YPosElbowRight > YPosWristRight)
+            {
+                res.RightElbowRightWrist = JointPositionsComparisonResult.More;
+            }
+            else
+            {
+                res.RightElbowRightWrist = JointPositionsComparisonResult.Less;
+            }
+
+            if (YPosElbowLeft > YPosWristLeft)
+            {
+                res.LeftElbowLeftWrist = JointPositionsComparisonResult.More;
+            }
+            else
+            {
+                res.LeftElbowLeftWrist = JointPositionsComparisonResult.Less;
+            }
+
+            if (YPosShoulderLeft > YPosElbowLeft)
+            {
+                res.LeftShoulderLeftElbow = JointPositionsComparisonResult.More;
+            }
+            else
+            {
+                res.LeftShoulderLeftElbow = JointPositionsComparisonResult.Less;
+            }
+
+            if (YPosShoulderRight > YPosElbowRight)
+            {
+                res.RightShoulderRightElbow = JointPositionsComparisonResult.More;
+            }
+            else
+            {
+                res.RightShoulderRightElbow = JointPositionsComparisonResult.Less;
+            }
+
+            return res;
         }
 
         /// <summary>
