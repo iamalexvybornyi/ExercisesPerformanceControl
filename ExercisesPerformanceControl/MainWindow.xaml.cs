@@ -276,12 +276,12 @@ namespace ExercisesPerformanceControl
 
             _gesture.GestureRecognized += Gesture_GestureRecognized;
 
-            ExText = "Ex3";
+            ExText = "Ex8";
 
             // Get all the skeleton data of an exercise
             skelList = FileRW.ReadSkelDataFromFile(ExText);
 
-            string userInput = "Input3";
+            string userInput = "Input8";
             skelListUser = FileRW.ReadSkelDataFromFile(userInput);
 
             frames = skelList.Count;
@@ -295,6 +295,19 @@ namespace ExercisesPerformanceControl
             }
             else
             {
+                //foreach (var skel in skelList)
+                //{
+                //    List<Point> tmpList = new List<Point>();
+                //    foreach (Joint joint in skel.Joints)
+                //    {
+                //        tmpList.Add(SkeletonPointToScreen(joint.Position));
+                //    }
+                //    pointsList.Add(tmpList);
+                //}
+
+                //string fileLocation = ExText + ".pnt";
+                //FileRW.WritePointsDataToFile(pointsList, fileLocation);
+
                 //foreach (var skel in skelListUser)
                 //{
                 //    List<Point> tmpList = new List<Point>();
@@ -305,8 +318,8 @@ namespace ExercisesPerformanceControl
                 //    pointsList.Add(tmpList);
                 //}
 
-                //string fileLocation = userInput + ".pnt";
-                //FileRW.WritePointsDataToFile(pointsList, fileLocation);
+                //string fileLocationUser = userInput + ".pnt";
+                //FileRW.WritePointsDataToFile(pointsList, fileLocationUser);
             }
 
             pointsList.Clear();
@@ -316,10 +329,10 @@ namespace ExercisesPerformanceControl
             pointsListUser = FileRW.ReadPointsDataFromFile(userInput);
 
             timerForReferenceMovement.Tick += new EventHandler(dispatcherTimer_TickReferenceMovement);
-            timerForReferenceMovement.Interval = new TimeSpan(0, 0, 0, 0, 35);
+            timerForReferenceMovement.Interval = new TimeSpan(0, 0, 0, 0, 33);
 
             timerForUserData.Tick += new EventHandler(dispatcherTimer_TickUserMovement);
-            timerForUserData.Interval = new TimeSpan(0, 0, 0, 0, 35);
+            timerForUserData.Interval = new TimeSpan(0, 0, 0, 0, 33);
 
             timerForReferenceMovement.Start();
             if (sensor == null)
@@ -534,7 +547,7 @@ namespace ExercisesPerformanceControl
                             //}
                             //else if (Written == false)
                             //{
-                            //    string fileLocation = "Input3.txt";
+                            //    string fileLocation = "Input8.txt";
                             //    FileRW.WriteSkelDataToFile(skelListForRecording, fileLocation);
                             //    Written = true;
                             //}

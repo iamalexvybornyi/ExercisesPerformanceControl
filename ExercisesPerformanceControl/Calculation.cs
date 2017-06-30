@@ -129,6 +129,26 @@ namespace ExercisesPerformanceControl
             return anglesStorage;
         }
 
+        private static JointPositionsComparisonResult CompareTwoJointsPositions(double Joint1, double Joint2)
+        {
+            JointPositionsComparisonResult res = new JointPositionsComparisonResult();
+
+            if (Joint1 - Joint2 <= 0.2)
+            {
+                res = JointPositionsComparisonResult.Equal;
+            }
+            else if (Joint1 > Joint2)
+            {
+                res = JointPositionsComparisonResult.More;
+            }
+            else
+            {
+                res = JointPositionsComparisonResult.Less;
+            }
+
+            return res;
+        }
+
         public static  JointPosComparisonResultStorage ComparePositionsOfJoints(Skeleton skeleton)
         {
             JointPosComparisonResultStorage res = new JointPosComparisonResultStorage();
@@ -140,41 +160,46 @@ namespace ExercisesPerformanceControl
             double YPosShoulderRight = skeleton.Joints[JointType.ShoulderRight].Position.Y;
             double YPosShoulderLeft = skeleton.Joints[JointType.ShoulderLeft].Position.Y;
 
-            if (YPosElbowRight > YPosWristRight)
-            {
-                res.RightElbowRightWrist = JointPositionsComparisonResult.More;
-            }
-            else
-            {
-                res.RightElbowRightWrist = JointPositionsComparisonResult.Less;
-            }
+            double XPosHipLeft = skeleton.Joints[JointType.HipLeft].Position.X;
+            double YPosHipLeft = skeleton.Joints[JointType.HipLeft].Position.Y;
+            double XPosKneeLeft = skeleton.Joints[JointType.KneeLeft].Position.X;
+            double YPosKneeLeft = skeleton.Joints[JointType.KneeLeft].Position.Y;
+            double XPosAnkleLeft = skeleton.Joints[JointType.AnkleLeft].Position.X;
+            double YPosAnkleLeft = skeleton.Joints[JointType.AnkleLeft].Position.Y;
 
-            if (YPosElbowLeft > YPosWristLeft)
-            {
-                res.LeftElbowLeftWrist = JointPositionsComparisonResult.More;
-            }
-            else
-            {
-                res.LeftElbowLeftWrist = JointPositionsComparisonResult.Less;
-            }
+            double XPosHipRight = skeleton.Joints[JointType.HipRight].Position.X;
+            double YPosHipRight = skeleton.Joints[JointType.HipRight].Position.Y;
+            double XPosKneeRight = skeleton.Joints[JointType.KneeRight].Position.X;
+            double YPosKneeRight = skeleton.Joints[JointType.KneeRight].Position.Y;
+            double XPosAnkleRight = skeleton.Joints[JointType.AnkleRight].Position.X;
+            double YPosAnkleRight = skeleton.Joints[JointType.AnkleRight].Position.Y;
 
-            if (YPosShoulderLeft > YPosElbowLeft)
-            {
-                res.LeftShoulderLeftElbow = JointPositionsComparisonResult.More;
-            }
-            else
-            {
-                res.LeftShoulderLeftElbow = JointPositionsComparisonResult.Less;
-            }
+            double YPosShoulderCenter = skeleton.Joints[JointType.ShoulderCenter].Position.Y;
+            double YPosHipCenter = skeleton.Joints[JointType.HipCenter].Position.Y;
+            double YPosSpine = skeleton.Joints[JointType.Spine].Position.Y;
 
-            if (YPosShoulderRight > YPosElbowRight)
-            {
-                res.RightShoulderRightElbow = JointPositionsComparisonResult.More;
-            }
-            else
-            {
-                res.RightShoulderRightElbow = JointPositionsComparisonResult.Less;
-            }
+            res.RightElbowRightWrist = CompareTwoJointsPositions(YPosElbowRight, YPosWristRight);
+            res.RightShoulderRightElbow = CompareTwoJointsPositions(YPosShoulderRight, YPosElbowRight);
+            res.RightShoulderRightWrist = CompareTwoJointsPositions(YPosShoulderRight, YPosWristRight);
+
+
+            res.LeftElbowLeftWrist = CompareTwoJointsPositions(YPosElbowLeft, YPosWristLeft);
+            res.LeftShoulderLeftElbow = CompareTwoJointsPositions(YPosShoulderLeft, YPosElbowLeft);
+            res.LeftShoulderLeftWrist = CompareTwoJointsPositions(YPosShoulderLeft, YPosWristLeft);
+
+            res.LeftHipLeftKneeX = CompareTwoJointsPositions(XPosHipLeft, XPosKneeLeft);
+            res.LeftHipLeftKneeY = CompareTwoJointsPositions(YPosHipLeft, YPosKneeLeft);
+            res.LeftKneeLeftAnkleX = CompareTwoJointsPositions(XPosKneeLeft, XPosAnkleLeft);
+            res.LeftKneeLeftAnkleY = CompareTwoJointsPositions(YPosKneeLeft, YPosKneeLeft);
+
+            res.RightHipRightKneeX = CompareTwoJointsPositions(XPosHipRight, XPosKneeRight);
+            res.RightHipRightKneeY = CompareTwoJointsPositions(YPosHipRight, YPosKneeRight);
+            res.RightKneeRightAnkleX = CompareTwoJointsPositions(XPosKneeRight, XPosAnkleRight);
+            res.RightKneeRightAnkleY = CompareTwoJointsPositions(YPosKneeRight, YPosKneeRight);
+
+            res.ShoulderCenterHipCenter = CompareTwoJointsPositions(YPosShoulderCenter, YPosHipCenter);
+            res.ShoulderCenterSpine = CompareTwoJointsPositions(YPosShoulderCenter, YPosSpine);
+            res.SpineHipCenter = CompareTwoJointsPositions(YPosSpine, YPosHipCenter);
 
             return res;
         }
