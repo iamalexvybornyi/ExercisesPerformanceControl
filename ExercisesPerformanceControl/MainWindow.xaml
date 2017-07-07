@@ -1,26 +1,10 @@
 ﻿<Window x:Class="ExercisesPerformanceControl.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="MainWindow" Height="735" Width="1024" Loaded="WindowLoaded">
-    
-    
-    <Grid Name="layoutGrid" Margin="10 0 10 0">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
-        <TextBlock Name="Reps" Opacity="0.5" Background="Black" Margin="0,0,0,0" HorizontalAlignment="Right" VerticalAlignment="Bottom" Foreground="White" FontFamily="Segoe UI" FontSize="58" Height="78" Width="804">0</TextBlock>
-        <Viewbox Grid.Row="1" Stretch="Uniform" HorizontalAlignment="Right">
-            <Grid>
-                <Image Name="ImageForLiveData" Width="420" Height="480"/>
-            </Grid>
-        </Viewbox>
-        <Viewbox Grid.Row="1" Stretch="Uniform" HorizontalAlignment="Left">
-            <Grid>
-                <Image Name="ImageForRecordedData" Height="480" Width="420"/>
-            </Grid>
-        </Viewbox>
+        Title="MainWindow" Height="139.477" Width="513.553">
+    <Grid>
+        <Button Name="RecExBtn" Content="Записать упражнение" HorizontalAlignment="Left" VerticalAlignment="Top" Width="254" Height="105" Click="RecExBtn_Click"/>
+        <TextBox Name="NameOfTheEx" VerticalAlignment="Top" Width="250" Height="25" Margin="259,0,0,0"></TextBox>
+        <Button Name="ChooseExBtn" Content="Выбрать упражнение" VerticalAlignment="Top" Height="75" Margin="259,30,0,0" Click="ChooseExBtn_Click"/>
     </Grid>
 </Window>

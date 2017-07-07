@@ -6,7 +6,7 @@ namespace ExercisesPerformanceControl
 {
     public class HandRaiseGesture
     {
-        readonly int WINDOW_SIZE = 150;
+        readonly int WINDOW_SIZE = 50;
 
         IGestureSegment[] _segments;
 

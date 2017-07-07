@@ -64,10 +64,24 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="ExerciseControl.xaml.cs">
+      <DependentUpon>ExerciseControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ExerciseRecording.xaml.cs">
+      <DependentUpon>ExerciseRecording.xaml</DependentUpon>
+    </Compile>
     <Compile Include="JointPosComparisonResultStorage.cs" />
     <Compile Include="JointPositionsComparisonResult.cs" />
     <Compile Include="WaveGesture.cs" />
     <Compile Include="WaveGestureSegments.cs" />
+    <Page Include="ExerciseControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ExerciseRecording.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

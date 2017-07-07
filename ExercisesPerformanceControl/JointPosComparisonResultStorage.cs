@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ExercisesPerformanceControl
 {
-    class JointPosComparisonResultStorage
+    public class JointPosComparisonResultStorage
     {
         public JointPositionsComparisonResult LeftShoulderLeftElbow;
         public JointPositionsComparisonResult LeftShoulderLeftWrist;
