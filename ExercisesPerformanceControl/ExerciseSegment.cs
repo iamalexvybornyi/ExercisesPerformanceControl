@@ -28,7 +28,7 @@ namespace ExercisesPerformanceControl
         public static int error = 20;
     }
 
-    public class HandRaise : IGestureSegment
+    public class ExerciseSegment : IGestureSegment
     {
         /// <summary>
         /// Updates the current gesture.

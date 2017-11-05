@@ -193,7 +193,7 @@ namespace ExercisesPerformanceControl
         List<List<Point>> pointsList = new List<List<Point>>();
         List<List<Point>> pointsListUser = new List<List<Point>>();
 
-        static HandRaiseGesture _gesture = new HandRaiseGesture();
+        static ExerciseGesture _gesture = new ExerciseGesture();
 
 
 
