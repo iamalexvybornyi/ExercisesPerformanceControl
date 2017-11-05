@@ -17,7 +17,7 @@ namespace ExercisesPerformanceControl
 
         public HandRaiseGesture()
         {
-            HandRaise1 handRaiseSegment = new HandRaise1();
+            HandRaise handRaiseSegment = new HandRaise();
 
             _segments = new IGestureSegment[]
             {
