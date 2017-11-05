@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace ExercisesPerformanceControl
 {
-    public class HandRaiseGesture
+    public class ExerciseGesture
     {
         readonly int WINDOW_SIZE = 50;
 
@@ -15,22 +15,22 @@ namespace ExercisesPerformanceControl
 
         public event EventHandler GestureRecognized;
 
-        public HandRaiseGesture()
+        public ExerciseGesture()
         {
-            HandRaise handRaiseSegment = new HandRaise();
+            ExerciseSegment exerciseSegment = new ExerciseSegment();
 
             _segments = new IGestureSegment[]
             {
-                handRaiseSegment,
-                handRaiseSegment,
-                handRaiseSegment,
-                handRaiseSegment,
-                handRaiseSegment,
-                handRaiseSegment,
-                handRaiseSegment,
-                handRaiseSegment,
-                handRaiseSegment,
-                handRaiseSegment
+                exerciseSegment,
+                exerciseSegment,
+                exerciseSegment,
+                exerciseSegment,
+                exerciseSegment,
+                exerciseSegment,
+                exerciseSegment,
+                exerciseSegment,
+                exerciseSegment,
+                exerciseSegment
             };
         }
 
