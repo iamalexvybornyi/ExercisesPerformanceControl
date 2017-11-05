@@ -72,8 +72,8 @@
     </Compile>
     <Compile Include="JointPosComparisonResultStorage.cs" />
     <Compile Include="JointPositionsComparisonResult.cs" />
-    <Compile Include="WaveGesture.cs" />
-    <Compile Include="WaveGestureSegments.cs" />
+    <Compile Include="ExerciseGesture.cs" />
+    <Compile Include="ExerciseSegment.cs" />
     <Page Include="ExerciseControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
