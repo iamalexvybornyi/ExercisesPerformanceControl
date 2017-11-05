@@ -49,10 +49,8 @@ namespace ExercisesPerformanceControl
                 {
                     return GesturePartResult.Succeeded;
                 }
-                else
-                {
-                    return GesturePartResult.Uncertain;
-                }
+
+                return GesturePartResult.Uncertain;
             }
             else
             {
