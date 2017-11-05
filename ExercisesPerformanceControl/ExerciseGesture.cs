@@ -41,7 +41,7 @@ namespace ExercisesPerformanceControl
         public void Update(Skeleton skeleton, List<Skeleton> skelList)
         {
             int frames = skelList.Count;
-            int frame = frames / 10;
+            int frame = frames / _segments.Length;
 
             GesturePartResult result = _segments[_currentSegment].Update(skeleton, skelList[frame * (_currentSegment + 1) - 1]);
 
