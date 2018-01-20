@@ -24,7 +24,7 @@ namespace ExercisesPerformanceControl
 
     public class Helper
     {
-        public static double err = 0.2;
+        public static double err = 0.1;
         public static int error = 20;
     }
 

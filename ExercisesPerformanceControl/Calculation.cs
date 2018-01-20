@@ -133,7 +133,7 @@ namespace ExercisesPerformanceControl
         {
             JointPositionsComparisonResult res = new JointPositionsComparisonResult();
 
-            if (Joint1 - Joint2 <= 0.2)
+            if (Joint1 - Joint2 <= Helper.err)
             {
                 res = JointPositionsComparisonResult.Equal;
             }
