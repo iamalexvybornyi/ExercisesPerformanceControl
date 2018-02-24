@@ -1,10 +1,66 @@
 ﻿<Window x:Class="ExercisesPerformanceControl.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="MainWindow" Height="139.477" Width="513.553">
+        Title="MainWindow" Height="546.477" Width="818.553">
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="258*"/>
+            <ColumnDefinition Width="553*"/>
+        </Grid.ColumnDefinitions>
         <Button Name="RecExBtn" Content="Записать упражнение" HorizontalAlignment="Left" VerticalAlignment="Top" Width="254" Height="105" Click="RecExBtn_Click"/>
-        <TextBox Name="NameOfTheEx" VerticalAlignment="Top" Width="250" Height="25" Margin="259,0,0,0"></TextBox>
-        <Button Name="ChooseExBtn" Content="Выбрать упражнение" VerticalAlignment="Top" Height="75" Margin="259,30,0,0" Click="ChooseExBtn_Click"/>
+        <TextBox Name="NameOfTheEx" VerticalAlignment="Top" Height="25" Margin="2,0,149,0" Grid.Column="1"/>
+        <Button Name="ChooseExBtn" Content="Выбрать упражнение" VerticalAlignment="Top" Height="75" Margin="10,430,-9,0" Click="ChooseExBtn_Click" Grid.Column="1"/>
+        <ListBox Name="ListOfExrcs" Margin="2,30,0,224" Grid.Column="1">
+            <ListBoxItem Name="Ex1">
+                <StackPanel Margin="5" Orientation="Horizontal">
+                    <Label VerticalContentAlignment="Center">Поднимание рук через стороны</Label>
+                </StackPanel>
+            </ListBoxItem>
+            <ListBoxItem Name="Ex2">
+                <StackPanel Margin="5" Orientation="Horizontal">
+                    <Label VerticalContentAlignment="Center">Вращение в локтевых суставах</Label>
+                </StackPanel>
+            </ListBoxItem>
+            <ListBoxItem Name="Ex3">
+                <StackPanel Margin="5" Orientation="Horizontal">
+                    <Label VerticalContentAlignment="Center">Выжимание двумя руками из положения "кисти к плечам"</Label>
+                </StackPanel>
+            </ListBoxItem>
+            <ListBoxItem Name="Ex4">
+                <StackPanel Margin="5" Orientation="Horizontal">
+                    <Label VerticalContentAlignment="Center">Джампинг джек</Label>
+                </StackPanel>
+            </ListBoxItem>
+            <ListBoxItem Name="Ex5">
+                <StackPanel Margin="5" Orientation="Horizontal">
+                    <Label VerticalContentAlignment="Center">Наклоны в стороны</Label>
+                </StackPanel>
+            </ListBoxItem>
+            <ListBoxItem Name="Ex6">
+                <StackPanel Margin="5" Orientation="Horizontal">
+                    <Label VerticalContentAlignment="Center">Приседания</Label>
+                </StackPanel>
+            </ListBoxItem>
+            <ListBoxItem Name="Ex7">
+                <StackPanel Margin="5" Orientation="Horizontal">
+                    <Label VerticalContentAlignment="Center">Приседания с поднятыми руками</Label>
+                </StackPanel>
+            </ListBoxItem>
+            <ListBoxItem Name="Ex8">
+                <StackPanel Margin="5" Orientation="Horizontal">
+                    <Label VerticalContentAlignment="Center">Трастеры</Label>
+                </StackPanel>
+            </ListBoxItem>
+            <ListBoxItem Name="Ex9">
+                <StackPanel Margin="5" Orientation="Horizontal">
+                    <Label VerticalContentAlignment="Center">Выпады в сторону</Label>
+                </StackPanel>
+            </ListBoxItem>
+            <ListBoxItem Name="Ex10">
+                <StackPanel Margin="5" Orientation="Horizontal">
+                    <Label VerticalContentAlignment="Center">Поднимание бедер стоя на месте</Label>
+                </StackPanel>
+            </ListBoxItem>
+        </ListBox>
     </Grid>
 </Window>

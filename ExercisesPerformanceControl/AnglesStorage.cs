@@ -112,11 +112,11 @@ namespace ExercisesPerformanceControl
             var KnL = Math.Abs(this.angleInLeftKnee - other.angleInLeftKnee);
             var KnR = Math.Abs(this.angleInRightKnee - other.angleInRightKnee);
 
-            var HipCL = Math.Abs(this.angleInHipCenterLeft - other.angleInHipCenterLeft);
-            var HipCR = Math.Abs(this.angleInHipCenterRight - other.angleInHipCenterRight);
+            //var HipCL = Math.Abs(this.angleInHipCenterLeft - other.angleInHipCenterLeft);
+            //var HipCR = Math.Abs(this.angleInHipCenterRight - other.angleInHipCenterRight);
 
-            var HipR = Math.Abs(this.angleInRightHip - other.angleInRightHip);
-            var HipL = Math.Abs(this.angleInLeftHip - other.angleInLeftHip);
+            //var HipR = Math.Abs(this.angleInRightHip - other.angleInRightHip);
+            //var HipL = Math.Abs(this.angleInLeftHip - other.angleInLeftHip);
 
             // Angles
             if (ER <= Helper.error &&
@@ -124,11 +124,11 @@ namespace ExercisesPerformanceControl
                 ShR <= Helper.error &&
                 ShL <= Helper.error &&
                 KnL <= Helper.error &&
-                KnR <= Helper.error &&
-                HipCL <= Helper.error &&
-                HipCR <= Helper.error &&
-                HipR <= Helper.error &&
-                HipL <= Helper.error)
+                KnR <= Helper.error)
+                //HipCL <= Helper.error &&
+                //HipCR <= Helper.error &&
+                //HipR <= Helper.error &&
+                //HipL <= Helper.error)
             {
                 return true;
             }

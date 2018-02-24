@@ -27,6 +27,10 @@ namespace ExercisesPerformanceControl
         public MainWindow()
         {
             InitializeComponent();
+            ListBoxItem itm = new ListBoxItem();
+            itm.Content = "some text";
+
+            this.ListOfExrcs.Items.Add(itm);
         }
 
         private void ChooseExBtn_Click(object sender, RoutedEventArgs e)
