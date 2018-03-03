@@ -282,7 +282,7 @@ namespace ExercisesPerformanceControl
             // Get all the skeleton data of an exercise
             skelList = FileRW.ReadSkelDataFromFile(ExText);
 
-            string userInput = "Input" + ExName;
+            string userInput = ExName;
             skelListUser = FileRW.ReadSkelDataFromFile(userInput);
 
             frames = skelList.Count;

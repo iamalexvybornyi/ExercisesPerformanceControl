@@ -42,7 +42,7 @@ namespace ExercisesPerformanceControl
         {
             ExerciseControl page = new ExerciseControl();
             dynamic tmp = this.ListOfExrcs.SelectedItem;
-            page.ExName = tmp.Name;
+            page.ExName = tmp.Content;
             page.ShowDialog();
         }
 
