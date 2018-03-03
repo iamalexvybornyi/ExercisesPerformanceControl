@@ -83,7 +83,7 @@ namespace ExercisesPerformanceControl
         {
             List<Skeleton> Motion = null;
             Stream stream = null;
-            String fileLocation = ExText + ".txt";
+            String fileLocation = @"ExercisesData\" + ExText + ".txt";
 
             // Read file using deserialization
             try

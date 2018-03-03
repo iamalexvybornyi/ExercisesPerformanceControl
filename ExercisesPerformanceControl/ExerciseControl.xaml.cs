@@ -277,7 +277,7 @@ namespace ExercisesPerformanceControl
 
             _gesture.GestureRecognized += Gesture_GestureRecognized;
 
-            ExText = "Ex" + ExName;
+            ExText = ExName;
 
             // Get all the skeleton data of an exercise
             skelList = FileRW.ReadSkelDataFromFile(ExText);

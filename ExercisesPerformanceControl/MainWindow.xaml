@@ -11,56 +11,6 @@
         <TextBox Name="NameOfTheEx" VerticalAlignment="Top" Height="25" Margin="2,0,149,0" Grid.Column="1"/>
         <Button Name="ChooseExBtn" Content="Выбрать упражнение" VerticalAlignment="Top" Height="75" Margin="10,430,-9,0" Click="ChooseExBtn_Click" Grid.Column="1"/>
         <ListBox Name="ListOfExrcs" Margin="2,30,0,224" Grid.Column="1">
-            <ListBoxItem Name="Ex1">
-                <StackPanel Margin="5" Orientation="Horizontal">
-                    <Label VerticalContentAlignment="Center">Поднимание рук через стороны</Label>
-                </StackPanel>
-            </ListBoxItem>
-            <ListBoxItem Name="Ex2">
-                <StackPanel Margin="5" Orientation="Horizontal">
-                    <Label VerticalContentAlignment="Center">Вращение в локтевых суставах</Label>
-                </StackPanel>
-            </ListBoxItem>
-            <ListBoxItem Name="Ex3">
-                <StackPanel Margin="5" Orientation="Horizontal">
-                    <Label VerticalContentAlignment="Center">Выжимание двумя руками из положения "кисти к плечам"</Label>
-                </StackPanel>
-            </ListBoxItem>
-            <ListBoxItem Name="Ex4">
-                <StackPanel Margin="5" Orientation="Horizontal">
-                    <Label VerticalContentAlignment="Center">Джампинг джек</Label>
-                </StackPanel>
-            </ListBoxItem>
-            <ListBoxItem Name="Ex5">
-                <StackPanel Margin="5" Orientation="Horizontal">
-                    <Label VerticalContentAlignment="Center">Наклоны в стороны</Label>
-                </StackPanel>
-            </ListBoxItem>
-            <ListBoxItem Name="Ex6">
-                <StackPanel Margin="5" Orientation="Horizontal">
-                    <Label VerticalContentAlignment="Center">Приседания</Label>
-                </StackPanel>
-            </ListBoxItem>
-            <ListBoxItem Name="Ex7">
-                <StackPanel Margin="5" Orientation="Horizontal">
-                    <Label VerticalContentAlignment="Center">Приседания с поднятыми руками</Label>
-                </StackPanel>
-            </ListBoxItem>
-            <ListBoxItem Name="Ex8">
-                <StackPanel Margin="5" Orientation="Horizontal">
-                    <Label VerticalContentAlignment="Center">Трастеры</Label>
-                </StackPanel>
-            </ListBoxItem>
-            <ListBoxItem Name="Ex9">
-                <StackPanel Margin="5" Orientation="Horizontal">
-                    <Label VerticalContentAlignment="Center">Выпады в сторону</Label>
-                </StackPanel>
-            </ListBoxItem>
-            <ListBoxItem Name="Ex10">
-                <StackPanel Margin="5" Orientation="Horizontal">
-                    <Label VerticalContentAlignment="Center">Поднимание бедер стоя на месте</Label>
-                </StackPanel>
-            </ListBoxItem>
         </ListBox>
     </Grid>
 </Window>

@@ -27,10 +27,15 @@ namespace ExercisesPerformanceControl
         public MainWindow()
         {
             InitializeComponent();
-            ListBoxItem itm = new ListBoxItem();
-            itm.Content = "some text";
 
-            this.ListOfExrcs.Items.Add(itm);
+            // Adding exercises data from files to listBoxItem
+            string[] filePaths = Directory.GetFiles(@"ExercisesData\", "*.txt", SearchOption.TopDirectoryOnly);
+            foreach (var filePath in filePaths)
+            {
+                ListBoxItem itm = new ListBoxItem();
+                itm.Content = System.IO.Path.GetFileNameWithoutExtension(filePath);
+                this.ListOfExrcs.Items.Add(itm);
+            }
         }
 
         private void ChooseExBtn_Click(object sender, RoutedEventArgs e)
