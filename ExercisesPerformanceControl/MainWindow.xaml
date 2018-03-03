@@ -1,16 +1,15 @@
 ﻿<Window x:Class="ExercisesPerformanceControl.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="MainWindow" Height="546.477" Width="818.553">
+        Title="MainWindow" Height="390.477" Width="818.553">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="258*"/>
             <ColumnDefinition Width="553*"/>
         </Grid.ColumnDefinitions>
         <Button Name="RecExBtn" Content="Записать упражнение" HorizontalAlignment="Left" VerticalAlignment="Top" Width="254" Height="105" Click="RecExBtn_Click"/>
-        <TextBox Name="NameOfTheEx" VerticalAlignment="Top" Height="25" Margin="2,0,149,0" Grid.Column="1"/>
-        <Button Name="ChooseExBtn" Content="Выбрать упражнение" VerticalAlignment="Top" Height="75" Margin="10,430,-9,0" Click="ChooseExBtn_Click" Grid.Column="1"/>
-        <ListBox Name="ListOfExrcs" Margin="2,30,0,224" Grid.Column="1">
+        <Button Name="ChooseExBtn" Content="Выбрать упражнение" VerticalAlignment="Top" Height="75" Margin="2,266,-1,0" Click="ChooseExBtn_Click" Grid.Column="1"/>
+        <ListBox Name="ListOfExrcs" Margin="2,0,0,98" Grid.Column="1">
         </ListBox>
     </Grid>
 </Window>

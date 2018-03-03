@@ -41,7 +41,8 @@ namespace ExercisesPerformanceControl
         private void ChooseExBtn_Click(object sender, RoutedEventArgs e)
         {
             ExerciseControl page = new ExerciseControl();
-            page.ExName = this.NameOfTheEx.Text;
+            dynamic tmp = this.ListOfExrcs.SelectedItem;
+            page.ExName = tmp.Name;
             page.ShowDialog();
         }
 
