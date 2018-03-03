@@ -49,21 +49,37 @@ namespace ExercisesPerformanceControl
             {
                 if (_currentSegment + 1 < _segments.Length)
                 {
+                    Console.WriteLine("@@@@@@@@@@@@@@@@@=======SUCCESSFUL SEGMENT " + _currentSegment + "=======@@@@@@@@@@@@@@@@@" );
                     _currentSegment++;
                     _frameCount = 0;
-                    Console.WriteLine(_currentSegment);
                 }
                 else
                 {
                     if (GestureRecognized != null)
                     {
                         GestureRecognized(this, new EventArgs());
+                        Console.WriteLine("@@@@@@@@@@@@@@@@@=======SUCCESSFUL MOVEMENT=======@@@@@@@@@@@@@@@@@");
                         Reset();
                     }
                 }
             }
-            else if (result == GesturePartResult.Failed || _frameCount == WINDOW_SIZE)
+            else if (result == GesturePartResult.Failed)
             {
+                Console.WriteLine("@@@@@@@@@@@@@@@@@=======WRONG MOVEMENT=======@@@@@@@@@@@@@@@@@");
+                Console.WriteLine("@@@@@@@@@@@@@@@@@=======Error in segment " + _currentSegment + "=======@@@@@@@@@@@@@@@@@");
+                Dictionary<JointType, int> jointsWithErrors = AnglesStorage.CompareAngles(
+                    Calculation.getAnglesInSkeletonJoints(skeleton),
+                    Calculation.getAnglesInSkeletonJoints(skelList[frame * (_currentSegment + 1) - 1]));
+                Console.WriteLine("The errors are in next joints:");
+                foreach (KeyValuePair<JointType, int> jointWithError in jointsWithErrors)
+                {
+                    Console.WriteLine(jointWithError.Key);
+                }
+                Reset();
+            }
+            else if (_frameCount == WINDOW_SIZE)
+            {
+                Console.WriteLine("@@@@@@@@@@@@@@@@@=======TOO SLOW=======@@@@@@@@@@@@@@@@@");
                 Reset();
             }
             else
