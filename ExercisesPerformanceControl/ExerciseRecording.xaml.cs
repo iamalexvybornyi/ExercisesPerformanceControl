@@ -617,7 +617,7 @@ namespace ExercisesPerformanceControl
 
         private void SaveBtn_Click(object sender, RoutedEventArgs e)
         {
-            string fileLocation = NameOfTheExTextbox.Text;
+            string fileLocation = @"ExercisesData\" + NameOfTheExTextbox.Text;
 
             int start = Convert.ToInt16(StartingFrameTextbox.Text);
             int end = Convert.ToInt16(EndingFrameTextbox.Text);
