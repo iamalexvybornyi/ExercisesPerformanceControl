@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Kinect;
 
 namespace ExercisesPerformanceControl
 {
@@ -100,6 +101,21 @@ namespace ExercisesPerformanceControl
             angleInLeftKnee = new double();
             angleInRightAnkle = new double();
             angleInLeftAnkle = new double();
+        }
+
+        public static Dictionary<JointType, int> CompareAngles(AnglesStorage first, AnglesStorage second)
+        {
+            Dictionary<JointType, int> anglesDifference = new Dictionary<JointType, int>();
+            anglesDifference.Add(JointType.ElbowRight, Convert.ToInt32(Math.Abs(first.angleInRightElbow - second.angleInRightElbow)));
+            anglesDifference.Add(JointType.ElbowLeft, Convert.ToInt32(Math.Abs(first.angleInLeftElbow - second.angleInLeftElbow)));
+            anglesDifference.Add(JointType.ShoulderRight, Convert.ToInt32(Math.Abs(first.angleInRightShoulder - second.angleInRightShoulder)));
+            anglesDifference.Add(JointType.ShoulderLeft, Convert.ToInt32(Math.Abs(first.angleInLeftShoulder - second.angleInLeftShoulder)));
+            anglesDifference.Add(JointType.KneeLeft, Convert.ToInt32(Math.Abs(first.angleInLeftKnee - second.angleInLeftKnee)));
+            anglesDifference.Add(JointType.KneeRight, Convert.ToInt32(Math.Abs(first.angleInRightKnee - second.angleInRightKnee)));
+
+            anglesDifference = anglesDifference.Where(p => p.Value > Helper.error).ToDictionary(p => p.Key, p => p.Value);
+
+            return anglesDifference;
         }
 
         public bool Equals(AnglesStorage other)

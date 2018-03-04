@@ -62,6 +62,8 @@ namespace ExercisesPerformanceControl
 
         private List<Skeleton> skelListUser = new List<Skeleton>();
 
+        Dictionary<JointType, int> dictWIthCurrentlyFailedJoints = new Dictionary<JointType, int>();
+
         /// <summary>
         /// Skeleton data list to record a movement
         /// </summary>
@@ -145,6 +147,11 @@ namespace ExercisesPerformanceControl
         private readonly Brush inferredJointBrush = Brushes.Yellow;
 
         /// <summary>
+        /// Brush used for drawing joints that are currently with errors
+        /// </summary>        
+        private readonly Brush failedJointBrush = Brushes.Red;
+
+        /// <summary>
         /// Pen used for drawing bones that are currently tracked
         /// </summary>
         private readonly Pen trackedBonePen = new Pen(Brushes.Green, 10);
@@ -191,6 +198,8 @@ namespace ExercisesPerformanceControl
         List<List<Point>> pointsListUser = new List<List<Point>>();
 
         static ExerciseGesture _gesture = new ExerciseGesture();
+
+        int framesToShowErrors = 0;
 
 
         public ExerciseControl()
@@ -474,9 +483,9 @@ namespace ExercisesPerformanceControl
                                 skelIsTracked = true;
                             }
 
-                            this.DrawBonesAndJoints(skel, dc);
+                            Dictionary<JointType, int> jointsWithErrors = _gesture.Update(skel, skelList);
 
-                            _gesture.Update(skel, skelList);
+                            this.DrawBonesAndJoints(skel, dc, jointsWithErrors);
 
                             // All these commented lines below were used to record exercises. That's why they're still here.
                             
@@ -552,7 +561,7 @@ namespace ExercisesPerformanceControl
         /// </summary>
         /// <param name="skeleton">skeleton to draw</param>
         /// <param name="drawingContext">drawing context to draw to</param>
-        private void DrawBonesAndJoints(Skeleton skeleton, DrawingContext drawingContext)
+        private void DrawBonesAndJoints(Skeleton skeleton, DrawingContext drawingContext, Dictionary<JointType, int> jointsWithErrors)
         {
             // Render Torso
             this.DrawBone(skeleton, drawingContext, JointType.Head, JointType.ShoulderCenter);
@@ -601,13 +610,28 @@ namespace ExercisesPerformanceControl
                 {
                     drawingContext.DrawEllipse(drawBrush, null, this.SkeletonPointToScreen(joint.Position), JointThickness, JointThickness);
                     JointThickness = 3;
+                }
+            }
 
-                    if (joint.JointType == JointType.ShoulderLeft)
-                    {
-                        double angle = Calculation.getAngle(skeleton, JointType.ShoulderCenter, JointType.ShoulderLeft, JointType.ElbowLeft);
-                        FormattedText formattedText = new FormattedText(String.Format("{0:0.00}", angle), CultureInfo.GetCultureInfo("en-us"), FlowDirection.LeftToRight, new Typeface("Verdana"), 32, Brushes.Black);
-                        drawingContext.DrawText(formattedText, this.SkeletonPointToScreen(joint.Position));
-                    }
+            if (jointsWithErrors.Count > 0)
+            {
+                framesToShowErrors = 20;
+                dictWIthCurrentlyFailedJoints = jointsWithErrors;
+            }
+
+            if (framesToShowErrors > 0)
+            {
+                Brush drawBrushForFailedJoints = null;
+                foreach (KeyValuePair<JointType, int> jointWithError in dictWIthCurrentlyFailedJoints)
+                {
+                    JointThickness = 15;
+                    drawBrushForFailedJoints = this.failedJointBrush;
+                    drawingContext.DrawEllipse(drawBrushForFailedJoints, null, this.SkeletonPointToScreen(skeleton.Joints[jointWithError.Key].Position), JointThickness, JointThickness);
+                }
+                framesToShowErrors--;
+                if (framesToShowErrors == 0)
+                {
+                    dictWIthCurrentlyFailedJoints.Clear();
                 }
             }
         }
