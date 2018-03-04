@@ -38,12 +38,13 @@ namespace ExercisesPerformanceControl
         /// Updates the current gesture.
         /// </summary>
         /// <param name="skeleton">The skeleton data.</param>
-        public void Update(Skeleton skeleton, List<Skeleton> skelList)
+        public Dictionary<JointType, int> Update(Skeleton skeleton, List<Skeleton> skelList)
         {
             int frames = skelList.Count;
             int frame = frames / _segments.Length;
 
             GesturePartResult result = _segments[_currentSegment].Update(skeleton, skelList[frame * (_currentSegment + 1) - 1]);
+            Dictionary<JointType, int> jointsWithErrors = new Dictionary<JointType, int>();
 
             if (result == GesturePartResult.Succeeded)
             {
@@ -67,7 +68,7 @@ namespace ExercisesPerformanceControl
             {
                 Console.WriteLine("@@@@@@@@@@@@@@@@@=======WRONG MOVEMENT=======@@@@@@@@@@@@@@@@@");
                 Console.WriteLine("@@@@@@@@@@@@@@@@@=======Error in segment " + _currentSegment + "=======@@@@@@@@@@@@@@@@@");
-                Dictionary<JointType, int> jointsWithErrors = AnglesStorage.CompareAngles(
+                jointsWithErrors = AnglesStorage.CompareAngles(
                     Calculation.getAnglesInSkeletonJoints(skeleton),
                     Calculation.getAnglesInSkeletonJoints(skelList[frame * (_currentSegment + 1) - 1]));
                 Console.WriteLine("The errors are in next joints:");
@@ -86,6 +87,8 @@ namespace ExercisesPerformanceControl
             {
                 _frameCount++;
             }
+
+            return jointsWithErrors;
         }
 
         /// <summary>
