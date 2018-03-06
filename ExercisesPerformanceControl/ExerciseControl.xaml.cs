@@ -56,16 +56,13 @@ namespace ExercisesPerformanceControl
         private byte[] colorPixels;
 
         /// <summary>
-        /// Name of an exercise
-        /// </summary>
-        public string ExText = "";
-
-        /// <summary>
         /// List for skeleton data
         /// </summary>
         private List<Skeleton> skelList = new List<Skeleton>();
 
         private List<Skeleton> skelListUser = new List<Skeleton>();
+
+        Dictionary<JointType, int> dictWIthCurrentlyFailedJoints = new Dictionary<JointType, int>();
 
         /// <summary>
         /// Skeleton data list to record a movement
@@ -150,6 +147,11 @@ namespace ExercisesPerformanceControl
         private readonly Brush inferredJointBrush = Brushes.Yellow;
 
         /// <summary>
+        /// Brush used for drawing joints that are currently with errors
+        /// </summary>        
+        private readonly Brush failedJointBrush = Brushes.Red;
+
+        /// <summary>
         /// Pen used for drawing bones that are currently tracked
         /// </summary>
         private readonly Pen trackedBonePen = new Pen(Brushes.Green, 10);
@@ -185,7 +187,7 @@ namespace ExercisesPerformanceControl
         private DrawingImage imageSourceForRecordedData;
 
         /// <summary>
-        /// Var for the name of the exercise
+        /// Name of the exercise
         /// </summary>
         public string ExName = "";
 
@@ -196,6 +198,8 @@ namespace ExercisesPerformanceControl
         List<List<Point>> pointsListUser = new List<List<Point>>();
 
         static ExerciseGesture _gesture = new ExerciseGesture();
+
+        int framesToShowErrors = 0;
 
 
         public ExerciseControl()
@@ -271,75 +275,29 @@ namespace ExercisesPerformanceControl
 
             if (null == this.sensor)
             {
-                //MessageBox.Show("Kinect не подключен или работает некорректно! Проверьте подключение и попробуйте еще раз.", "Состояние Kinect", MessageBoxButton.OK, MessageBoxImage.Warning);
-                //this.Close();
+                MessageBox.Show("Kinect не подключен или работает некорректно! Проверьте подключение и попробуйте еще раз.", "Состояние Kinect", MessageBoxButton.OK, MessageBoxImage.Warning);
+                this.Close();
             }
 
             _gesture.GestureRecognized += Gesture_GestureRecognized;
 
-            ExText = ExName;
-
             // Get all the skeleton data of an exercise
-            skelList = FileRW.ReadSkelDataFromFile(ExText);
-
-            string userInput = ExName;
-            skelListUser = FileRW.ReadSkelDataFromFile(userInput);
-
+            skelList = FileRW.ReadSkelDataFromFile(ExName);
             frames = skelList.Count;
-            framesUserData = skelListUser.Count;
 
-            // Check if the files were read correctly
+            // Check if the files have been read correctly
             if (skelList.Count() == 0)
             {
                 MessageBox.Show("Не найдены файлы с данными! Убедитесь, что они находятся в папке с программой.", "Отсутствие файлов!", MessageBoxButton.OK, MessageBoxImage.Warning);
                 this.Close();
             }
-            else
-            {
-                //foreach (var skel in skelList)
-                //{
-                //    List<Point> tmpList = new List<Point>();
-                //    foreach (Joint joint in skel.Joints)
-                //    {
-                //        tmpList.Add(SkeletonPointToScreen(joint.Position));
-                //    }
-                //    pointsList.Add(tmpList);
-                //}
-
-                //string fileLocation = ExText + ".pnt";
-                //FileRW.WritePointsDataToFile(pointsList, fileLocation);
-
-                //foreach (var skel in skelListUser)
-                //{
-                //    List<Point> tmpList = new List<Point>();
-                //    foreach (Joint joint in skel.Joints)
-                //    {
-                //        tmpList.Add(SkeletonPointToScreen(joint.Position));
-                //    }
-                //    pointsList.Add(tmpList);
-                //}
-
-                //string fileLocationUser = userInput + ".pnt";
-                //FileRW.WritePointsDataToFile(pointsList, fileLocationUser);
-            }
 
             pointsList.Clear();
-            pointsList = FileRW.ReadPointsDataFromFile(ExText);
-
-            pointsListUser.Clear();
-            pointsListUser = FileRW.ReadPointsDataFromFile(userInput);
+            pointsList = FileRW.ReadPointsDataFromFile(ExName);
 
             timerForReferenceMovement.Tick += new EventHandler(dispatcherTimer_TickReferenceMovement);
             timerForReferenceMovement.Interval = new TimeSpan(0, 0, 0, 0, 20);
-
-            timerForUserData.Tick += new EventHandler(dispatcherTimer_TickUserMovement);
-            timerForUserData.Interval = new TimeSpan(0, 0, 0, 0, 20);
-
             timerForReferenceMovement.Start();
-            if (sensor == null)
-            {
-                timerForUserData.Start();
-            }
         }
 
         /// <summary>
@@ -405,45 +363,6 @@ namespace ExercisesPerformanceControl
 
                 // prevent drawing outside of our render area
                 this.drawingGroupForRecordedData.ClipGeometry = new RectangleGeometry(new Rect(0.0, 0.0, RenderWidth, RenderHeight));
-
-            }
-        }
-
-        private void dispatcherTimer_TickUserMovement(object sender, EventArgs e)
-        {
-            //=================Draw skelelton for recorded data=======================================
-            using (DrawingContext dc2 = this.drawingGroupForLiveData.Open())
-            {
-                // Draw a transparent background to set the render size
-                dc2.DrawRectangle(Brushes.Transparent, null, new Rect(0.0, 0.0, RenderWidth, RenderHeight));
-
-                if (skelListUser.Count != 0)
-                {
-                    RenderClippedEdges(skelListUser[indexUserData], dc2);
-
-                    if (skelListUser[indexUserData].TrackingState == SkeletonTrackingState.Tracked)
-                    {
-                        this.DrawBonesAndJointsForRecordedDataUser(skelListUser[indexUserData], dc2);
-                        _gesture.Update(skelListUser[indexUserData], skelList);
-                    }
-                    else if (skelListUser[indexUserData].TrackingState == SkeletonTrackingState.PositionOnly)
-                    {
-                        dc2.DrawEllipse(
-                        this.centerPointBrush,
-                        null,
-                        pointsListUser[indexUserData][0],
-                        BodyCenterThickness,
-                        BodyCenterThickness);
-                    }
-
-                    // Increase index of the recorded exercise current frame
-                    indexUserData++;
-                    if (indexUserData >= framesUserData)
-                        indexUserData = 0;
-                }
-
-                // prevent drawing outside of our render area
-                this.drawingGroupForLiveData.ClipGeometry = new RectangleGeometry(new Rect(0.0, 0.0, RenderWidth, RenderHeight));
 
             }
         }
@@ -564,9 +483,9 @@ namespace ExercisesPerformanceControl
                                 skelIsTracked = true;
                             }
 
-                            this.DrawBonesAndJoints(skel, dc);
+                            Dictionary<JointType, int> jointsWithErrors = _gesture.Update(skel, skelList);
 
-                            _gesture.Update(skel, skelList);
+                            this.DrawBonesAndJoints(skel, dc, jointsWithErrors);
 
                             // All these commented lines below were used to record exercises. That's why they're still here.
                             
@@ -635,85 +554,14 @@ namespace ExercisesPerformanceControl
             this.DrawBoneForRecordedData(skeleton, drawingContext, JointType.HipRight, JointType.KneeRight, 16, 17);
             this.DrawBoneForRecordedData(skeleton, drawingContext, JointType.KneeRight, JointType.AnkleRight, 17, 18);
             this.DrawBoneForRecordedData(skeleton, drawingContext, JointType.AnkleRight, JointType.FootRight, 18, 19);
-
-            int counter = 0;
-            foreach (var point in pointsList[index])
-            {
-                Brush drawBrush = this.trackedJointBrush;
-                drawingContext.DrawEllipse(drawBrush, null, point, JointThickness, JointThickness);
-
-                if (counter == 4)
-                {
-                    double angle = Calculation.getAngle(skelList[index], JointType.ShoulderCenter, JointType.ShoulderLeft, JointType.ElbowLeft);
-                    FormattedText formattedText = new FormattedText(String.Format("{0:0.00}", angle), CultureInfo.GetCultureInfo("en-us"), FlowDirection.LeftToRight, new Typeface("Verdana"), 32, Brushes.Black);
-                    drawingContext.DrawText(formattedText, point);
-                }
-
-                JointThickness = 3;
-                counter++;
-            }
         }
 
         /// <summary>
-        /// Draws a skeleton's bones and joints for recorded data
+        /// Draws a skeleton's bones and joints for live data
         /// </summary>
         /// <param name="skeleton">skeleton to draw</param>
         /// <param name="drawingContext">drawing context to draw to</param>
-        private void DrawBonesAndJointsForRecordedDataUser(Skeleton skeleton, DrawingContext drawingContext)
-        {
-            // Render Torso
-            this.DrawBoneForRecordedDataUser(skeleton, drawingContext, JointType.Head, JointType.ShoulderCenter, 3, 2);
-            this.DrawBoneForRecordedDataUser(skeleton, drawingContext, JointType.ShoulderCenter, JointType.ShoulderLeft, 2, 4);
-            this.DrawBoneForRecordedDataUser(skeleton, drawingContext, JointType.ShoulderCenter, JointType.ShoulderRight, 2, 8);
-            this.DrawBoneForRecordedDataUser(skeleton, drawingContext, JointType.ShoulderCenter, JointType.Spine, 2, 1);
-            this.DrawBoneForRecordedDataUser(skeleton, drawingContext, JointType.Spine, JointType.HipCenter, 1, 0);
-            this.DrawBoneForRecordedDataUser(skeleton, drawingContext, JointType.HipCenter, JointType.HipLeft, 0, 12);
-            this.DrawBoneForRecordedDataUser(skeleton, drawingContext, JointType.HipCenter, JointType.HipRight, 0, 16);
-
-            // Left Arm
-            this.DrawBoneForRecordedDataUser(skeleton, drawingContext, JointType.ShoulderLeft, JointType.ElbowLeft, 4, 5);
-            this.DrawBoneForRecordedDataUser(skeleton, drawingContext, JointType.ElbowLeft, JointType.WristLeft, 5, 6);
-            this.DrawBoneForRecordedDataUser(skeleton, drawingContext, JointType.WristLeft, JointType.HandLeft, 6, 7);
-
-            // Right Arm
-            this.DrawBoneForRecordedDataUser(skeleton, drawingContext, JointType.ShoulderRight, JointType.ElbowRight, 8, 9);
-            this.DrawBoneForRecordedDataUser(skeleton, drawingContext, JointType.ElbowRight, JointType.WristRight, 9, 10);
-            this.DrawBoneForRecordedDataUser(skeleton, drawingContext, JointType.WristRight, JointType.HandRight, 10, 11);
-
-            // Left Leg
-            this.DrawBoneForRecordedDataUser(skeleton, drawingContext, JointType.HipLeft, JointType.KneeLeft, 12, 13);
-            this.DrawBoneForRecordedDataUser(skeleton, drawingContext, JointType.KneeLeft, JointType.AnkleLeft, 13, 14);
-            this.DrawBoneForRecordedDataUser(skeleton, drawingContext, JointType.AnkleLeft, JointType.FootLeft, 14, 15);
-
-            // Right Leg
-            this.DrawBoneForRecordedDataUser(skeleton, drawingContext, JointType.HipRight, JointType.KneeRight, 16, 17);
-            this.DrawBoneForRecordedDataUser(skeleton, drawingContext, JointType.KneeRight, JointType.AnkleRight, 17, 18);
-            this.DrawBoneForRecordedDataUser(skeleton, drawingContext, JointType.AnkleRight, JointType.FootRight, 18, 19);
-
-            int counter = 0;
-            foreach (var point in pointsListUser[indexUserData])
-            {
-                Brush drawBrush = this.trackedJointBrush;
-                drawingContext.DrawEllipse(drawBrush, null, point, JointThickness, JointThickness);
-                JointThickness = 3;
-
-                if (counter == 4)
-                {
-                    double angle = Calculation.getAngle(skelListUser[indexUserData], JointType.ShoulderCenter, JointType.ShoulderLeft, JointType.ElbowLeft);
-                    FormattedText formattedText = new FormattedText(String.Format("{0:0.00}", angle), CultureInfo.GetCultureInfo("en-us"), FlowDirection.LeftToRight, new Typeface("Verdana"), 32, Brushes.Black);
-                    drawingContext.DrawText(formattedText, point);
-                }
-
-                counter++;
-            }
-        }
-
-        /// <summary>
-        /// Draws a skeleton's bones and joints for recorded data
-        /// </summary>
-        /// <param name="skeleton">skeleton to draw</param>
-        /// <param name="drawingContext">drawing context to draw to</param>
-        private void DrawBonesAndJoints(Skeleton skeleton, DrawingContext drawingContext)
+        private void DrawBonesAndJoints(Skeleton skeleton, DrawingContext drawingContext, Dictionary<JointType, int> jointsWithErrors)
         {
             // Render Torso
             this.DrawBone(skeleton, drawingContext, JointType.Head, JointType.ShoulderCenter);
@@ -762,13 +610,28 @@ namespace ExercisesPerformanceControl
                 {
                     drawingContext.DrawEllipse(drawBrush, null, this.SkeletonPointToScreen(joint.Position), JointThickness, JointThickness);
                     JointThickness = 3;
+                }
+            }
 
-                    if (joint.JointType == JointType.ShoulderLeft)
-                    {
-                        double angle = Calculation.getAngle(skeleton, JointType.ShoulderCenter, JointType.ShoulderLeft, JointType.ElbowLeft);
-                        FormattedText formattedText = new FormattedText(String.Format("{0:0.00}", angle), CultureInfo.GetCultureInfo("en-us"), FlowDirection.LeftToRight, new Typeface("Verdana"), 32, Brushes.Black);
-                        drawingContext.DrawText(formattedText, this.SkeletonPointToScreen(joint.Position));
-                    }
+            if (jointsWithErrors.Count > 0)
+            {
+                framesToShowErrors = 20;
+                dictWIthCurrentlyFailedJoints = jointsWithErrors;
+            }
+
+            if (framesToShowErrors > 0)
+            {
+                Brush drawBrushForFailedJoints = null;
+                foreach (KeyValuePair<JointType, int> jointWithError in dictWIthCurrentlyFailedJoints)
+                {
+                    JointThickness = 15;
+                    drawBrushForFailedJoints = this.failedJointBrush;
+                    drawingContext.DrawEllipse(drawBrushForFailedJoints, null, this.SkeletonPointToScreen(skeleton.Joints[jointWithError.Key].Position), JointThickness, JointThickness);
+                }
+                framesToShowErrors--;
+                if (framesToShowErrors == 0)
+                {
+                    dictWIthCurrentlyFailedJoints.Clear();
                 }
             }
         }
@@ -858,42 +721,6 @@ namespace ExercisesPerformanceControl
             }
 
             drawingContext.DrawLine(drawPen, pointsList[index][joint0Index], pointsList[index][joint1Index]);
-        }
-
-        /// <summary>
-        /// Draws a bone line between two joints
-        /// </summary>
-        /// <param name="skeleton">skeleton to draw bones from</param>
-        /// <param name="drawingContext">drawing context to draw to</param>
-        /// <param name="jointType0">joint to start drawing from</param>
-        /// <param name="jointType1">joint to end drawing at</param>
-        private void DrawBoneForRecordedDataUser(Skeleton skeleton, DrawingContext drawingContext, JointType jointType0, JointType jointType1, int joint0Index, int joint1Index)
-        {
-            Joint joint0 = skeleton.Joints[jointType0];
-            Joint joint1 = skeleton.Joints[jointType1];
-
-            // If we can't find either of these joints, exit
-            if (joint0.TrackingState == JointTrackingState.NotTracked ||
-                joint1.TrackingState == JointTrackingState.NotTracked)
-            {
-                return;
-            }
-
-            // Don't draw if both points are inferred
-            if (joint0.TrackingState == JointTrackingState.Inferred &&
-                joint1.TrackingState == JointTrackingState.Inferred)
-            {
-                return;
-            }
-
-            // We assume all drawn bones are inferred unless BOTH joints are tracked
-            Pen drawPen = this.inferredBonePen;
-            if (joint0.TrackingState == JointTrackingState.Tracked && joint1.TrackingState == JointTrackingState.Tracked)
-            {
-                drawPen = this.trackedBonePen;
-            }
-
-            drawingContext.DrawLine(drawPen, pointsListUser[indexUserData][joint0Index], pointsListUser[indexUserData][joint1Index]);
         }
 
         /// <summary>

@@ -30,6 +30,7 @@ namespace ExercisesPerformanceControl
 
     public class ExerciseSegment : IGestureSegment
     {
+        bool isInProgress = false;
         /// <summary>
         /// Updates the current gesture.
         /// </summary>
@@ -45,21 +46,31 @@ namespace ExercisesPerformanceControl
 
             if (refRes.Equals(userRes))
             {
+                isInProgress = true;
                 if (anglesInReferenceSkeleton.Equals(anglesInUserSkeleton))
                 {
+                    isInProgress = false;
+                    //Console.WriteLine("Success");
+                    //Console.WriteLine("======================");
                     return GesturePartResult.Succeeded;
                 }
 
+                //Console.WriteLine("Uncertain, in progress");
                 return GesturePartResult.Uncertain;
+            }
+            else if (!refRes.Equals(userRes) && isInProgress)
+            {
+                isInProgress = false;
+                //Console.WriteLine("FAIL");
+                //Console.WriteLine("======================");
+                return GesturePartResult.Failed;
             }
             else
             {
+                isInProgress = false;
+                //Console.WriteLine("Starting point of the segment");
                 return GesturePartResult.Uncertain;
             }
-
-            Console.WriteLine("1 failed");
-            // Hand dropped
-            return GesturePartResult.Failed;
         }
     }
 	
