@@ -1,7 +1,6 @@
 C:\Users\Александр\Documents\Visual Studio 2013\Projects\ExercisesPerformanceControl\ExercisesPerformanceControl\bin\Debug\ExercisesPerformanceControl.exe.config
 C:\Users\Александр\Documents\Visual Studio 2013\Projects\ExercisesPerformanceControl\ExercisesPerformanceControl\bin\Debug\ExercisesPerformanceControl.exe
 C:\Users\Александр\Documents\Visual Studio 2013\Projects\ExercisesPerformanceControl\ExercisesPerformanceControl\bin\Debug\ExercisesPerformanceControl.pdb
-C:\Users\Александр\Documents\Visual Studio 2013\Projects\ExercisesPerformanceControl\ExercisesPerformanceControl\obj\Debug\ExercisesPerformanceControl.csprojResolveAssemblyReference.cache
 C:\Users\Александр\Documents\Visual Studio 2013\Projects\ExercisesPerformanceControl\ExercisesPerformanceControl\obj\Debug\MainWindow.baml
 C:\Users\Александр\Documents\Visual Studio 2013\Projects\ExercisesPerformanceControl\ExercisesPerformanceControl\obj\Debug\MainWindow.g.cs
 C:\Users\Александр\Documents\Visual Studio 2013\Projects\ExercisesPerformanceControl\ExercisesPerformanceControl\obj\Debug\App.g.cs

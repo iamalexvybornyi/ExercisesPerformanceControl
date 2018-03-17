@@ -16,6 +16,7 @@ using Microsoft.Kinect;
 using System.IO;
 using System.Windows.Threading;
 using System.Globalization;
+using Microsoft.Kinect.Toolkit.BackgroundRemoval;
 
 namespace ExercisesPerformanceControl
 {
@@ -44,16 +45,31 @@ namespace ExercisesPerformanceControl
         /// </summary>
         private WriteableBitmap colorBitmap;
 
+        /// <summary>
+        /// Track whether Dispose has been called
+        /// </summary>
+        private bool disposed;
 
         /// <summary>
-        /// Flag with info about whether the skeleton is tracked or not
+        /// Library which does background 
         /// </summary>
-        bool skelIsTracked = false;
+        private BackgroundRemovedColorStream backgroundRemovedColorStream;
 
         /// <summary>
         /// Intermediate storage for the color data received from the camera
         /// </summary>
         private byte[] colorPixels;
+
+        /// <summary>
+        /// Flag that shows the end of the work with this window
+        /// </summary>
+        bool endFlag;
+
+
+        /// <summary>
+        /// Flag with info about whether the skeleton is tracked or not
+        /// </summary>
+        bool skelIsTracked = false;
 
         /// <summary>
         /// List for skeleton data
@@ -209,6 +225,9 @@ namespace ExercisesPerformanceControl
 
         private void WindowLoaded(object sender, RoutedEventArgs e)
         {
+            // Set end flag to false
+            endFlag = false;
+
             // Create the drawing group we'll use for drawing live data
             this.drawingGroupForLiveData = new DrawingGroup();
 
@@ -310,11 +329,11 @@ namespace ExercisesPerformanceControl
             // Disable all the streams and event handlers
             if (null != this.sensor)
             {
-                //endFlag = true;
-                //this.backgroundRemovedColorStream.Disable();
-                //this.backgroundRemovedColorStream.BackgroundRemovedFrameReady -= this.BackgroundRemovedFrameReadyHandler;
-                //this.backgroundRemovedColorStream.Dispose();
-                //this.backgroundRemovedColorStream = null;
+                endFlag = true;
+                this.backgroundRemovedColorStream.Disable();
+                this.backgroundRemovedColorStream.BackgroundRemovedFrameReady -= this.BackgroundRemovedFrameReadyHandler;
+                this.backgroundRemovedColorStream.Dispose();
+                this.backgroundRemovedColorStream = null;
 
                 this.sensor.AllFramesReady -= this.SensorAllFramesReady;
                 this.sensor.SkeletonFrameReady -= this.SensorSkeletonFrameReady;
@@ -416,6 +435,77 @@ namespace ExercisesPerformanceControl
         }
 
         /// <summary>
+        /// Handle the background removed color frame ready event. The frame obtained from the background removed
+        /// color stream is in RGBA format.
+        /// </summary>
+        /// <param name="sender">object that sends the event</param>
+        /// <param name="e">argument of the event</param>
+        private void BackgroundRemovedFrameReadyHandler(object sender, BackgroundRemovedColorFrameReadyEventArgs e)
+        {
+            using (var backgroundRemovedFrame = e.OpenBackgroundRemovedColorFrame())
+            {
+                if (backgroundRemovedFrame != null)
+                {
+                    if (null == this.foregroundBitmap || this.foregroundBitmap.PixelWidth != backgroundRemovedFrame.Width
+                        || this.foregroundBitmap.PixelHeight != backgroundRemovedFrame.Height)
+                    {
+                        this.foregroundBitmap = new WriteableBitmap(backgroundRemovedFrame.Width, backgroundRemovedFrame.Height, 96.0, 96.0, PixelFormats.Bgra32, null);
+
+                        // Set the image we display to point to the bitmap where we'll put the image data
+                        this.ImageForLiveDataWithRemovedBackground.Source = this.foregroundBitmap;
+                    }
+
+                    // Write the pixel data into our bitmap
+                    this.foregroundBitmap.WritePixels(
+                        new Int32Rect(0, 0, this.foregroundBitmap.PixelWidth, this.foregroundBitmap.PixelHeight),
+                        backgroundRemovedFrame.GetRawPixelData(),
+                        this.foregroundBitmap.PixelWidth * sizeof(int),
+                        0);
+                }
+            }
+
+        }
+
+        /// <summary>
+        /// Finalizes an instance of the class.
+        /// This destructor will run only if the Dispose method does not get called.
+        /// </summary>
+        ~ExerciseControl()
+        {
+            this.Dispose(false);
+        }
+
+        /// <summary>
+        /// Dispose the allocated frame buffers and reconstruction.
+        /// </summary>
+        public void Dispose()
+        {
+            this.Dispose(true);
+
+            // This object will be cleaned up by the Dispose method.
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Frees all memory associated with the FusionImageFrame.
+        /// </summary>
+        /// <param name="disposing">Whether the function was called from Dispose.</param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!this.disposed)
+            {
+                if (null != this.backgroundRemovedColorStream)
+                {
+                    this.backgroundRemovedColorStream.Dispose();
+                    this.backgroundRemovedColorStream = null;
+                    GC.SuppressFinalize(this);
+                }
+
+                this.disposed = true;
+            }
+        }
+
+        /// <summary>
         /// Event handler for Kinect sensor's DepthFrameReady event
         /// </summary>
         /// <param name="sender">object sending the event</param>
@@ -423,13 +513,28 @@ namespace ExercisesPerformanceControl
         private void SensorAllFramesReady(object sender, AllFramesReadyEventArgs e)
         {
             // in the middle of shutting down, or lingering events from previous sensor, do nothing here.
-            if (null == this.sensor || this.sensor != sender)
+            if (null == this.sensor || this.sensor != sender || endFlag)
             {
                 return;
             }
 
             try
             {
+                using (var depthFrame = e.OpenDepthImageFrame())
+                {
+                    if (null != depthFrame)
+                    {
+                        this.backgroundRemovedColorStream.ProcessDepth(depthFrame.GetRawPixelData(), depthFrame.Timestamp);
+                    }
+                }
+
+                using (var colorFrame = e.OpenColorImageFrame())
+                {
+                    if (null != colorFrame)
+                    {
+                        this.backgroundRemovedColorStream.ProcessColor(colorFrame.GetRawPixelData(), colorFrame.Timestamp);
+                    }
+                }
                 using (var skeletonFrame = e.OpenSkeletonFrame())
                 {
                     if (null != skeletonFrame)

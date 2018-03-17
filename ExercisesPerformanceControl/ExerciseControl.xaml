@@ -14,11 +14,13 @@
         <TextBlock Name="Reps" Opacity="0.5" Background="Black" Margin="0,0,0,0" HorizontalAlignment="Right" VerticalAlignment="Bottom" Foreground="White" FontFamily="Segoe UI" FontSize="58" Height="78" Width="804">0</TextBlock>
         <Viewbox Grid.Row="1" Stretch="Uniform" HorizontalAlignment="Right">
             <Grid>
+                <Image Name="ImageForLiveDataWithRemovedBackground" Width="420" Height="480"/>
                 <Image Name="ImageForLiveData" Width="420" Height="480"/>
             </Grid>
         </Viewbox>
         <Viewbox Grid.Row="1" Stretch="Uniform" HorizontalAlignment="Left">
             <Grid>
+                <Image Name="ImageForRecordedDataWithRemovedBackground" Height="480" Width="420"/>
                 <Image Name="ImageForRecordedData" Height="480" Width="420"/>
             </Grid>
         </Viewbox>
