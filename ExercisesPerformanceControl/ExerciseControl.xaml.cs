@@ -275,11 +275,17 @@ namespace ExercisesPerformanceControl
                 // Turn on the color stream
                 this.sensor.ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30);
 
+                // Turn on the backgroundRemoved color stream
+                this.backgroundRemovedColorStream = new BackgroundRemovedColorStream(this.sensor);
+                this.backgroundRemovedColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30, DepthImageFormat.Resolution320x240Fps30);
+
                 // Allocate space to put the depth, color, and skeleton data we'll receive
                 if (null == this.skeletons)
                 {
                     this.skeletons = new Skeleton[this.sensor.SkeletonStream.FrameSkeletonArrayLength];
                 }
+
+                this.backgroundRemovedColorStream.BackgroundRemovedFrameReady += this.BackgroundRemovedFrameReadyHandler;
 
                 // Start the sensor!
                 try
@@ -431,6 +437,7 @@ namespace ExercisesPerformanceControl
             if (!isTrackedSkeltonVisible && nearestSkeleton != 0)
             {
                 this.currentlyTrackedSkeletonId = nearestSkeleton;
+                this.backgroundRemovedColorStream.SetTrackedPlayer(nearestSkeleton);
             }
         }
 
@@ -540,6 +547,7 @@ namespace ExercisesPerformanceControl
                     if (null != skeletonFrame)
                     {
                         skeletonFrame.CopySkeletonDataTo(this.skeletons);
+                        this.backgroundRemovedColorStream.ProcessSkeleton(this.skeletons, skeletonFrame.Timestamp);
                     }
                 }
 

@@ -16,3 +16,4 @@ C:\Users\Александр\Documents\Visual Studio 2013\Projects\ExercisesPerfo
 C:\Users\Александр\Documents\Visual Studio 2013\Projects\ExercisesPerformanceControl\ExercisesPerformanceControl\obj\Debug\ExerciseRecording.baml
 C:\Users\Александр\Documents\Visual Studio 2013\Projects\ExercisesPerformanceControl\ExercisesPerformanceControl\obj\Debug\ExerciseControl.g.cs
 C:\Users\Александр\Documents\Visual Studio 2013\Projects\ExercisesPerformanceControl\ExercisesPerformanceControl\obj\Debug\ExerciseRecording.g.cs
+C:\Users\Александр\Documents\Visual Studio 2013\Projects\ExercisesPerformanceControl\ExercisesPerformanceControl\obj\Debug\ExercisesPerformanceControl.csprojResolveAssemblyReference.cache
