@@ -16,6 +16,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 using Microsoft.Kinect.Toolkit.BackgroundRemoval;
+using AForge.Video.FFMPEG;
 
 namespace ExercisesPerformanceControl
 {
@@ -762,6 +763,32 @@ namespace ExercisesPerformanceControl
 
             FileRW.WritePointsDataToFile(pointsList, fileLocation + ".pnt");
             FileRW.WriteSkelDataToFile(skelListForRecording, fileLocation + ".txt");
+
+            try
+            {
+                using (VideoFileWriter writer = new VideoFileWriter())
+                {
+                    writer.Open(fileLocation + NameOfTheExTextbox.Text + ".avi", 640, 480, 30, VideoCodec.MPEG4);
+
+                    foreach (var backRemovedFrame in bitmapListForRecording)
+                    {
+                        WriteableBitmap tmpBitmap = new WriteableBitmap(backRemovedFrame.width, backRemovedFrame.height, 96.0, 96.0, PixelFormats.Bgra32, null);
+                        tmpBitmap.WritePixels(
+                                new Int32Rect(0, 0, tmpBitmap.PixelWidth, tmpBitmap.PixelHeight),
+                                backRemovedFrame.pixelData,
+                                tmpBitmap.PixelWidth * sizeof(int),
+                                0);
+
+                        writer.WriteVideoFrame(Utils.BitmapFromWriteableBitmap(tmpBitmap));
+                    }
+                    writer.Close();
+                }
+            }
+            catch
+            {
+                MessageBox.Show("Видео не было сохранено!");
+            }
+
             timer.Stop();
             this.Close();
         }
@@ -803,8 +830,24 @@ namespace ExercisesPerformanceControl
 
                     // Increase index of the recorded exercise current frame
                     index++;
-                    if (index >= Convert.ToInt16(EndingFrameTextbox.Text))
-                        index = Convert.ToInt16(StartingFrameTextbox.Text);
+
+                    try
+                    {
+                        int startingIndex = Convert.ToInt16(StartingFrameTextbox.Text);
+                        int endingFrame = Convert.ToInt16(EndingFrameTextbox.Text);
+                        
+                        if (index >= Convert.ToInt16(EndingFrameTextbox.Text))
+                        {
+                            index = Convert.ToInt16(StartingFrameTextbox.Text);
+                        }
+                    }
+                    catch 
+                    {
+                        if (index >= bitmapListForRecording.Count())
+                        {
+                            index = Convert.ToInt16(StartingFrameTextbox.Text);
+                        }
+                    }
                 }
 
                 // prevent drawing outside of our render area
