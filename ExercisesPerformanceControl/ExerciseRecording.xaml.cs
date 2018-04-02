@@ -761,6 +761,11 @@ namespace ExercisesPerformanceControl
             pointsList.RemoveRange(end, pointsList.Count - end);
             pointsList.RemoveRange(0, start);
 
+            AmountOfFramesLabel.Content += skelListForRecording.Count.ToString();
+            StartingFrameTextbox.Text = "0";
+            EndingFrameTextbox.Text = (skelListForRecording.Count - 1).ToString();
+            index = 0;
+
             FileRW.WritePointsDataToFile(pointsList, fileLocation + ".pnt");
             FileRW.WriteSkelDataToFile(skelListForRecording, fileLocation + ".txt");
 
@@ -770,6 +775,7 @@ namespace ExercisesPerformanceControl
                 {
                     writer.Open(fileLocation + NameOfTheExTextbox.Text + ".avi", 640, 480, 30, VideoCodec.MPEG4);
 
+                    int counter = 0;
                     foreach (var backRemovedFrame in bitmapListForRecording)
                     {
                         WriteableBitmap tmpBitmap = new WriteableBitmap(backRemovedFrame.width, backRemovedFrame.height, 96.0, 96.0, PixelFormats.Bgra32, null);
@@ -779,9 +785,21 @@ namespace ExercisesPerformanceControl
                                 tmpBitmap.PixelWidth * sizeof(int),
                                 0);
 
-                        writer.WriteVideoFrame(Utils.BitmapFromWriteableBitmap(tmpBitmap));
+                        Utils.CreateThumbnail(@"ExercisesData\Pics\" + NameOfTheExTextbox.Text + counter.ToString() + ".jpg", tmpBitmap);
+                        //writer.WriteVideoFrame(Utils.BitmapFromWriteableBitmap(tmpBitmap));
+                        counter++;
+                    }
+
+                    foreach (var file in Directory.GetFiles(@"ExercisesData\Pics", "*.jpg"))
+                    {
+                        writer.WriteVideoFrame(System.Drawing.Bitmap.FromFile(file) as System.Drawing.Bitmap);
                     }
                     writer.Close();
+                }
+                System.IO.DirectoryInfo di = new DirectoryInfo(@"ExercisesData\Pics");
+                foreach (FileInfo file in di.GetFiles())
+                {
+                    file.Delete();
                 }
             }
             catch
