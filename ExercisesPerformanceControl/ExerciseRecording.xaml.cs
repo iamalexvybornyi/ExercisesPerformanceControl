@@ -761,6 +761,9 @@ namespace ExercisesPerformanceControl
             pointsList.RemoveRange(end, pointsList.Count - end);
             pointsList.RemoveRange(0, start);
 
+            bitmapListForRecording.RemoveRange(end, bitmapListForRecording.Count - end);
+            bitmapListForRecording.RemoveRange(0, start);
+
             AmountOfFramesLabel.Content += skelListForRecording.Count.ToString();
             StartingFrameTextbox.Text = "0";
             EndingFrameTextbox.Text = (skelListForRecording.Count - 1).ToString();
@@ -771,35 +774,31 @@ namespace ExercisesPerformanceControl
 
             try
             {
+                int counter = 0;
+                foreach (var backRemovedFrame in bitmapListForRecording)
+                {
+                    WriteableBitmap tmpBitmap = new WriteableBitmap(backRemovedFrame.width, backRemovedFrame.height, 96.0, 96.0, PixelFormats.Bgra32, null);
+                    tmpBitmap.WritePixels(
+                            new Int32Rect(0, 0, tmpBitmap.PixelWidth, tmpBitmap.PixelHeight),
+                            backRemovedFrame.pixelData,
+                            tmpBitmap.PixelWidth * sizeof(int),
+                            0);
+
+                    Utils.CreateThumbnailPNG(@"ExercisesData\Pics\" + NameOfTheExTextbox.Text + counter.ToString() + ".png", tmpBitmap);
+                    counter++;
+                }
+
                 using (VideoFileWriter writer = new VideoFileWriter())
                 {
                     writer.Open(fileLocation + NameOfTheExTextbox.Text + ".avi", 640, 480, 30, VideoCodec.MPEG4);
-
-                    int counter = 0;
-                    foreach (var backRemovedFrame in bitmapListForRecording)
+                    var files = new DirectoryInfo(@"ExercisesData\Pics").GetFiles().OrderBy(f => f.LastWriteTime).ToList();
+                    foreach (var file in files)
                     {
-                        WriteableBitmap tmpBitmap = new WriteableBitmap(backRemovedFrame.width, backRemovedFrame.height, 96.0, 96.0, PixelFormats.Bgra32, null);
-                        tmpBitmap.WritePixels(
-                                new Int32Rect(0, 0, tmpBitmap.PixelWidth, tmpBitmap.PixelHeight),
-                                backRemovedFrame.pixelData,
-                                tmpBitmap.PixelWidth * sizeof(int),
-                                0);
-
-                        Utils.CreateThumbnail(@"ExercisesData\Pics\" + NameOfTheExTextbox.Text + counter.ToString() + ".jpg", tmpBitmap);
-                        //writer.WriteVideoFrame(Utils.BitmapFromWriteableBitmap(tmpBitmap));
-                        counter++;
-                    }
-
-                    foreach (var file in Directory.GetFiles(@"ExercisesData\Pics", "*.jpg"))
-                    {
-                        writer.WriteVideoFrame(System.Drawing.Bitmap.FromFile(file) as System.Drawing.Bitmap);
+                        var bitmap = System.Drawing.Bitmap.FromFile(file.FullName) as System.Drawing.Bitmap;
+                        bitmap.MakeTransparent(bitmap.GetPixel(0, 0));
+                        writer.WriteVideoFrame(bitmap);
                     }
                     writer.Close();
-                }
-                System.IO.DirectoryInfo di = new DirectoryInfo(@"ExercisesData\Pics");
-                foreach (FileInfo file in di.GetFiles())
-                {
-                    file.Delete();
                 }
             }
             catch
@@ -809,6 +808,19 @@ namespace ExercisesPerformanceControl
 
             timer.Stop();
             this.Close();
+
+            System.GC.Collect();
+            System.GC.WaitForPendingFinalizers(); 
+
+            try
+            {
+                System.IO.DirectoryInfo di = new DirectoryInfo(@"ExercisesData\Pics");
+                foreach (FileInfo file in di.GetFiles())
+                {
+                    file.Delete();
+                }
+            }
+            catch { }
         }
 
         private void dispatcherTimer_Tick(object sender, EventArgs e)
@@ -821,6 +833,27 @@ namespace ExercisesPerformanceControl
 
                 if (skelListForRecording.Count != 0)
                 {
+                    // Increase index of the recorded exercise current frame
+                    index++;
+
+                    try
+                    {
+                        int startingIndex = Convert.ToInt16(StartingFrameTextbox.Text);
+                        int endingFrame = Convert.ToInt16(EndingFrameTextbox.Text);
+
+                        if (index >= Convert.ToInt16(EndingFrameTextbox.Text))
+                        {
+                            index = Convert.ToInt16(StartingFrameTextbox.Text);
+                        }
+                    }
+                    catch
+                    {
+                        if (index >= bitmapListForRecording.Count())
+                        {
+                            index = 0;
+                        }
+                    }
+
                     RenderClippedEdges(skelListForRecording[index], dc2);
 
                     if (skelListForRecording[index].TrackingState == SkeletonTrackingState.Tracked)
@@ -845,27 +878,6 @@ namespace ExercisesPerformanceControl
 
                     // Set the image we display to point to the bitmap where we'll put the image data
                     //this.ImageForLiveDataWithRemovedBackground.Source = this.foregroundBitmap;
-
-                    // Increase index of the recorded exercise current frame
-                    index++;
-
-                    try
-                    {
-                        int startingIndex = Convert.ToInt16(StartingFrameTextbox.Text);
-                        int endingFrame = Convert.ToInt16(EndingFrameTextbox.Text);
-                        
-                        if (index >= Convert.ToInt16(EndingFrameTextbox.Text))
-                        {
-                            index = Convert.ToInt16(StartingFrameTextbox.Text);
-                        }
-                    }
-                    catch 
-                    {
-                        if (index >= bitmapListForRecording.Count())
-                        {
-                            index = Convert.ToInt16(StartingFrameTextbox.Text);
-                        }
-                    }
                 }
 
                 // prevent drawing outside of our render area
