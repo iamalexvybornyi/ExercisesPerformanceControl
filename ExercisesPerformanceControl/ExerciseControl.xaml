@@ -14,12 +14,32 @@
         <TextBlock Name="Reps" Opacity="0.5" Background="Black" Margin="0,0,0,0" HorizontalAlignment="Right" VerticalAlignment="Bottom" Foreground="White" FontFamily="Segoe UI" FontSize="58" Height="78" Width="804">0</TextBlock>
         <Viewbox Grid.Row="1" Stretch="Uniform" HorizontalAlignment="Right">
             <Grid>
+                <Image Name="ImageForLiveDataWithRemovedBackground" Width="420" Height="480"/>
                 <Image Name="ImageForLiveData" Width="420" Height="480"/>
             </Grid>
         </Viewbox>
         <Viewbox Grid.Row="1" Stretch="Uniform" HorizontalAlignment="Left">
-            <Grid>
+            <Grid Width="399">
+                <Image Name="ImageForRecordedDataWithRemovedBackground" Height="480" Width="420"/>
                 <Image Name="ImageForRecordedData" Height="480" Width="420"/>
+                <MediaElement Name="VideoControl">
+                    <MediaElement.Triggers>
+                        <EventTrigger RoutedEvent="MediaElement.Loaded">
+                            <EventTrigger.Actions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+
+                                        <!-- The MediaTimeline has a RepeatBehavior="Forever" which makes the media play
+                     over and over indefinitely.-->
+                                        <MediaTimeline Name="VideoControlTimeline" Storyboard.TargetName="VideoControl"  
+                 RepeatBehavior="Forever" />
+
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger.Actions>
+                        </EventTrigger>
+                    </MediaElement.Triggers>
+                </MediaElement>
             </Grid>
         </Viewbox>
     </Grid>

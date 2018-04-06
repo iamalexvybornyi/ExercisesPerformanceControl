@@ -15,6 +15,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using Microsoft.Kinect.Toolkit.BackgroundRemoval;
+using AForge.Video.FFMPEG;
 
 namespace ExercisesPerformanceControl
 {
@@ -72,6 +74,11 @@ namespace ExercisesPerformanceControl
         private List<Skeleton> skelListForRecording = new List<Skeleton>();
 
         /// <summary>
+        /// Skeleton data list to record a movement
+        /// </summary>
+        private List<MyBackgroundRemovedColourFrame> bitmapListForRecording = new List<MyBackgroundRemovedColourFrame>();
+
+        /// <summary>
         /// Flag with info about whether the Silhouette data was recorded or not
         /// </summary>
         bool silWritten = false;
@@ -94,7 +101,7 @@ namespace ExercisesPerformanceControl
         /// <summary>
         /// Flag with an info about whether recording was finished or not
         /// </summary>
-        private bool Written = false;
+        private bool Written = true;
 
         /// <summary>
         /// Index of the exercise's current frame
@@ -184,6 +191,16 @@ namespace ExercisesPerformanceControl
         private DrawingImage imageSourceForRecordedData;
 
         /// <summary>
+        /// Library which does background 
+        /// </summary>
+        private BackgroundRemovedColorStream backgroundRemovedColorStream;
+
+        /// <summary>
+        /// Track whether Dispose has been called
+        /// </summary>
+        private bool disposed;
+
+        /// <summary>
         /// Var for the name of the exercise
         /// </summary>
         public string ExName = "";
@@ -248,11 +265,17 @@ namespace ExercisesPerformanceControl
                 // Turn on the color stream
                 this.sensor.ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30);
 
+                // Turn on the backgroundRemoved color stream
+                this.backgroundRemovedColorStream = new BackgroundRemovedColorStream(this.sensor);
+                this.backgroundRemovedColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30, DepthImageFormat.Resolution320x240Fps30);
+
                 // Allocate space to put the depth, color, and skeleton data we'll receive
                 if (null == this.skeletons)
                 {
                     this.skeletons = new Skeleton[this.sensor.SkeletonStream.FrameSkeletonArrayLength];
                 }
+
+                this.backgroundRemovedColorStream.BackgroundRemovedFrameReady += this.BackgroundRemovedFrameReadyHandler;
 
                 // Start the sensor!
                 try
@@ -270,6 +293,112 @@ namespace ExercisesPerformanceControl
                 MessageBox.Show("Kinect не подключен или работает некорректно! Проверьте подключение и попробуйте еще раз.", "Состояние Kinect", MessageBoxButton.OK, MessageBoxImage.Warning);
                 this.Close();
             }
+        }
+
+        /// <summary>
+        /// Execute shutdown tasks
+        /// </summary>
+        /// <param name="sender">object sending the event</param>
+        /// <param name="e">event arguments</param>
+        private void WindowClosing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            // Disable all the streams and event handlers
+            if (null != this.sensor)
+            {
+                this.backgroundRemovedColorStream.Disable();
+                this.backgroundRemovedColorStream.BackgroundRemovedFrameReady -= this.BackgroundRemovedFrameReadyHandler;
+                this.backgroundRemovedColorStream.Dispose();
+                this.backgroundRemovedColorStream = null;
+
+                this.sensor.AllFramesReady -= this.SensorAllFramesReady;
+                this.sensor.SkeletonFrameReady -= this.SensorSkeletonFrameReady;
+                this.sensor.DepthStream.Disable();
+                this.sensor.ColorStream.Disable();
+                this.sensor.SkeletonStream.Disable();
+
+                this.sensor.Stop();
+            }
+        }
+
+        /// <summary>
+        /// Finalizes an instance of the class.
+        /// This destructor will run only if the Dispose method does not get called.
+        /// </summary>
+        ~ExerciseRecording()
+        {
+            this.Dispose(false);
+        }
+
+        /// <summary>
+        /// Dispose the allocated frame buffers and reconstruction.
+        /// </summary>
+        public void Dispose()
+        {
+            this.Dispose(true);
+
+            // This object will be cleaned up by the Dispose method.
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Frees all memory associated with the FusionImageFrame.
+        /// </summary>
+        /// <param name="disposing">Whether the function was called from Dispose.</param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!this.disposed)
+            {
+                if (null != this.backgroundRemovedColorStream)
+                {
+                    this.backgroundRemovedColorStream.Dispose();
+                    this.backgroundRemovedColorStream = null;
+                    GC.SuppressFinalize(this);
+                }
+
+                this.disposed = true;
+            }
+        }
+
+        /// <summary>
+        /// Handle the background removed color frame ready event. The frame obtained from the background removed
+        /// color stream is in RGBA format.
+        /// </summary>
+        /// <param name="sender">object that sends the event</param>
+        /// <param name="e">argument of the event</param>
+        private void BackgroundRemovedFrameReadyHandler(object sender, BackgroundRemovedColorFrameReadyEventArgs e)
+        {
+            using (var backgroundRemovedFrame = e.OpenBackgroundRemovedColorFrame())
+            {
+                if (backgroundRemovedFrame != null)
+                {
+                    if (null == this.foregroundBitmap || this.foregroundBitmap.PixelWidth != backgroundRemovedFrame.Width
+                        || this.foregroundBitmap.PixelHeight != backgroundRemovedFrame.Height)
+                    {
+                        this.foregroundBitmap = new WriteableBitmap(backgroundRemovedFrame.Width, backgroundRemovedFrame.Height, 96.0, 96.0, PixelFormats.Bgra32, null);
+
+                        // Set the image we display to point to the bitmap where we'll put the image data
+                        this.ImageForLiveDataWithRemovedBackground.Source = this.foregroundBitmap;
+                    }
+
+                    // Write the pixel data into our bitmap
+                    this.foregroundBitmap.WritePixels(
+                        new Int32Rect(0, 0, this.foregroundBitmap.PixelWidth, this.foregroundBitmap.PixelHeight),
+                        backgroundRemovedFrame.GetRawPixelData(),
+                        this.foregroundBitmap.PixelWidth * sizeof(int),
+                        0);
+
+                    if (Written == false && (this.skeletons.Any(skel => skel.TrackingState == SkeletonTrackingState.Tracked)))
+                    {
+                        MyBackgroundRemovedColourFrame MyFrame = new MyBackgroundRemovedColourFrame(backgroundRemovedFrame);
+                        byte[] tmpPixelData = new byte[backgroundRemovedFrame.GetRawPixelData().Length];
+                        MyFrame.height = backgroundRemovedFrame.Height;
+                        MyFrame.width = backgroundRemovedFrame.Width;
+                        backgroundRemovedFrame.GetRawPixelData().CopyTo(MyFrame.pixelData, 0);
+                        bitmapListForRecording.Add(MyFrame);
+                    }
+                }
+            }
+
         }
 
         /// <summary>
@@ -311,6 +440,7 @@ namespace ExercisesPerformanceControl
             if (!isTrackedSkeltonVisible && nearestSkeleton != 0)
             {
                 this.currentlyTrackedSkeletonId = nearestSkeleton;
+                this.backgroundRemovedColorStream.SetTrackedPlayer(nearestSkeleton);
             }
         }
 
@@ -329,17 +459,34 @@ namespace ExercisesPerformanceControl
 
             try
             {
+                using (var depthFrame = e.OpenDepthImageFrame())
+                {
+                    if (null != depthFrame)
+                    {
+                        this.backgroundRemovedColorStream.ProcessDepth(depthFrame.GetRawPixelData(), depthFrame.Timestamp);
+                    }
+                }
+
+                using (var colorFrame = e.OpenColorImageFrame())
+                {
+                    if (null != colorFrame)
+                    {
+                        this.backgroundRemovedColorStream.ProcessColor(colorFrame.GetRawPixelData(), colorFrame.Timestamp);
+                    }
+                }
+
                 using (var skeletonFrame = e.OpenSkeletonFrame())
                 {
                     if (null != skeletonFrame)
                     {
                         skeletonFrame.CopySkeletonDataTo(this.skeletons);
+                        this.backgroundRemovedColorStream.ProcessSkeleton(this.skeletons, skeletonFrame.Timestamp);
                     }
                 }
 
                 this.ChooseSkeleton();
             }
-            catch (InvalidOperationException)
+            catch
             {
                 // Ignore the exception. 
             }
@@ -398,12 +545,6 @@ namespace ExercisesPerformanceControl
                                 }
                                 pointsList.Add(tmpList);
                             }
-                            //else if (Written == false)
-                            //{
-                            //    string fileLocation = "Input8.txt";
-                            //    FileRW.WriteSkelDataToFile(skelListForRecording, fileLocation);
-                            //    Written = true;
-                            //}
 
                         }
                         else if (skel.TrackingState == SkeletonTrackingState.PositionOnly && currentlyTrackedSkeletonId == skel.TrackingId)
@@ -477,13 +618,6 @@ namespace ExercisesPerformanceControl
                 {
                     drawingContext.DrawEllipse(drawBrush, null, this.SkeletonPointToScreen(joint.Position), JointThickness, JointThickness);
                     JointThickness = 3;
-
-                    if (joint.JointType == JointType.ShoulderLeft)
-                    {
-                        double angle = Calculation.getAngle(skeleton, JointType.ShoulderCenter, JointType.ShoulderLeft, JointType.ElbowLeft);
-                        FormattedText formattedText = new FormattedText(String.Format("{0:0.00}", angle), CultureInfo.GetCultureInfo("en-us"), FlowDirection.LeftToRight, new Typeface("Verdana"), 32, Brushes.Black);
-                        drawingContext.DrawText(formattedText, this.SkeletonPointToScreen(joint.Position));
-                    }
                 }
             }
         }
@@ -594,17 +728,16 @@ namespace ExercisesPerformanceControl
 
             if (null != this.sensor)
             {
-                //endFlag = true;
                 //this.backgroundRemovedColorStream.Disable();
                 //this.backgroundRemovedColorStream.BackgroundRemovedFrameReady -= this.BackgroundRemovedFrameReadyHandler;
                 //this.backgroundRemovedColorStream.Dispose();
                 //this.backgroundRemovedColorStream = null;
 
-                this.sensor.AllFramesReady -= this.SensorAllFramesReady;
-                this.sensor.SkeletonFrameReady -= this.SensorSkeletonFrameReady;
-                this.sensor.DepthStream.Disable();
-                this.sensor.ColorStream.Disable();
-                this.sensor.SkeletonStream.Disable();
+                //this.sensor.AllFramesReady -= this.SensorAllFramesReady;
+                //this.sensor.SkeletonFrameReady -= this.SensorSkeletonFrameReady;
+                //this.sensor.DepthStream.Disable();
+                //this.sensor.ColorStream.Disable();
+                //this.sensor.SkeletonStream.Disable();
 
                 this.sensor.Stop();
             }
@@ -628,10 +761,65 @@ namespace ExercisesPerformanceControl
             pointsList.RemoveRange(end, pointsList.Count - end);
             pointsList.RemoveRange(0, start);
 
+            bitmapListForRecording.RemoveRange(end, bitmapListForRecording.Count - end);
+            bitmapListForRecording.RemoveRange(0, start);
+
+            AmountOfFramesLabel.Content += skelListForRecording.Count.ToString();
+            StartingFrameTextbox.Text = "0";
+            EndingFrameTextbox.Text = (skelListForRecording.Count - 1).ToString();
+            index = 0;
+
             FileRW.WritePointsDataToFile(pointsList, fileLocation + ".pnt");
             FileRW.WriteSkelDataToFile(skelListForRecording, fileLocation + ".txt");
+
+            try
+            {
+                int counter = 0;
+                foreach (var backRemovedFrame in bitmapListForRecording)
+                {
+                    WriteableBitmap tmpBitmap = new WriteableBitmap(backRemovedFrame.width, backRemovedFrame.height, 96.0, 96.0, PixelFormats.Bgra32, null);
+                    tmpBitmap.WritePixels(
+                            new Int32Rect(0, 0, tmpBitmap.PixelWidth, tmpBitmap.PixelHeight),
+                            backRemovedFrame.pixelData,
+                            tmpBitmap.PixelWidth * sizeof(int),
+                            0);
+
+                    Utils.CreateThumbnailPNG(@"ExercisesData\Pics\" + NameOfTheExTextbox.Text + counter.ToString() + ".png", tmpBitmap);
+                    counter++;
+                }
+
+                using (VideoFileWriter writer = new VideoFileWriter())
+                {
+                    writer.Open(fileLocation + ".avi", 640, 480, 30, VideoCodec.MPEG4);
+                    var files = new DirectoryInfo(@"ExercisesData\Pics").GetFiles().OrderBy(f => f.LastWriteTime).ToList();
+                    foreach (var file in files)
+                    {
+                        var bitmap = System.Drawing.Bitmap.FromFile(file.FullName) as System.Drawing.Bitmap;
+                        bitmap.MakeTransparent(bitmap.GetPixel(0, 0));
+                        writer.WriteVideoFrame(bitmap);
+                    }
+                    writer.Close();
+                }
+            }
+            catch
+            {
+                MessageBox.Show("Видео не было сохранено!");
+            }
+
             timer.Stop();
             this.Close();
+
+            System.GC.Collect();
+            System.GC.WaitForPendingFinalizers(); 
+            try
+            {
+                System.IO.DirectoryInfo di = new DirectoryInfo(@"ExercisesData\Pics");
+                foreach (FileInfo file in di.GetFiles())
+                {
+                    file.Delete();
+                }
+            }
+            catch { }
         }
 
         private void dispatcherTimer_Tick(object sender, EventArgs e)
@@ -644,6 +832,27 @@ namespace ExercisesPerformanceControl
 
                 if (skelListForRecording.Count != 0)
                 {
+                    // Increase index of the recorded exercise current frame
+                    index++;
+
+                    try
+                    {
+                        int startingIndex = Convert.ToInt16(StartingFrameTextbox.Text);
+                        int endingFrame = Convert.ToInt16(EndingFrameTextbox.Text);
+
+                        if (index >= Convert.ToInt16(EndingFrameTextbox.Text))
+                        {
+                            index = Convert.ToInt16(StartingFrameTextbox.Text);
+                        }
+                    }
+                    catch
+                    {
+                        if (index >= bitmapListForRecording.Count())
+                        {
+                            index = 0;
+                        }
+                    }
+
                     RenderClippedEdges(skelListForRecording[index], dc2);
 
                     if (skelListForRecording[index].TrackingState == SkeletonTrackingState.Tracked)
@@ -660,10 +869,14 @@ namespace ExercisesPerformanceControl
                         BodyCenterThickness);
                     }
 
-                    // Increase index of the recorded exercise current frame
-                    index++;
-                    if (index >= Convert.ToInt16(EndingFrameTextbox.Text))
-                        index = Convert.ToInt16(StartingFrameTextbox.Text);
+                    this.foregroundBitmap.WritePixels(
+                        new Int32Rect(0, 0, this.foregroundBitmap.PixelWidth, this.foregroundBitmap.PixelHeight),
+                        bitmapListForRecording[index].pixelData,
+                        this.foregroundBitmap.PixelWidth * sizeof(int),
+                        0);
+
+                    // Set the image we display to point to the bitmap where we'll put the image data
+                    //this.ImageForLiveDataWithRemovedBackground.Source = this.foregroundBitmap;
                 }
 
                 // prevent drawing outside of our render area
