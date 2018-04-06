@@ -138,6 +138,11 @@ namespace ExercisesPerformanceControl
         private double JointThickness = 3;
 
         /// <summary>
+        /// Thickness of drawn failed joint lines
+        /// </summary>
+        private double FailedJointThickness = 15;
+
+        /// <summary>
         /// Thickness of body center ellipse
         /// </summary>
         private const double BodyCenterThickness = 10;
@@ -166,6 +171,11 @@ namespace ExercisesPerformanceControl
         /// Brush used for drawing joints that are currently with errors
         /// </summary>        
         private readonly Brush failedJointBrush = Brushes.Red;
+
+        /// <summary>
+        /// Brush used for drawing joints that are currently in uncertain state
+        /// </summary>        
+        private readonly Brush uncertainJointBrush = Brushes.Yellow;
 
         /// <summary>
         /// Pen used for drawing bones that are currently tracked
@@ -738,9 +748,21 @@ namespace ExercisesPerformanceControl
                 }
             }
 
-            if (jointsWithErrors.Count > 0)
+            GesturePartResult tmpRes = ExerciseGesture.getResult();
+
+            if (tmpRes == GesturePartResult.Uncertain || framesToShowErrors!=0)
             {
-                framesToShowErrors = 20;
+                Brush drawBrushForUncertainJoints = null;
+                foreach (KeyValuePair<JointType, int> jointWithError in jointsWithErrors)
+                {
+                    drawBrushForUncertainJoints = this.uncertainJointBrush;
+                    drawingContext.DrawEllipse(drawBrushForUncertainJoints, null, this.SkeletonPointToScreen(skeleton.Joints[jointWithError.Key].Position), FailedJointThickness, FailedJointThickness);
+                }
+            }
+
+            if (jointsWithErrors.Count > 0 && tmpRes == GesturePartResult.Failed)
+            {
+                framesToShowErrors = 15;
                 dictWIthCurrentlyFailedJoints = jointsWithErrors;
             }
 
@@ -749,9 +771,8 @@ namespace ExercisesPerformanceControl
                 Brush drawBrushForFailedJoints = null;
                 foreach (KeyValuePair<JointType, int> jointWithError in dictWIthCurrentlyFailedJoints)
                 {
-                    JointThickness = 15;
                     drawBrushForFailedJoints = this.failedJointBrush;
-                    drawingContext.DrawEllipse(drawBrushForFailedJoints, null, this.SkeletonPointToScreen(skeleton.Joints[jointWithError.Key].Position), JointThickness, JointThickness);
+                    drawingContext.DrawEllipse(drawBrushForFailedJoints, null, this.SkeletonPointToScreen(skeleton.Joints[jointWithError.Key].Position), FailedJointThickness, FailedJointThickness);
                 }
                 framesToShowErrors--;
                 if (framesToShowErrors == 0)

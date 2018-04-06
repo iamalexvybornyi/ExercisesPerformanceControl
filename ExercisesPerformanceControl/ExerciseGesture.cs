@@ -10,6 +10,8 @@ namespace ExercisesPerformanceControl
 
         IGestureSegment[] _segments;
 
+        private static GesturePartResult result;
+
         int _currentSegment = 0;
         int _frameCount = 0;
 
@@ -34,6 +36,11 @@ namespace ExercisesPerformanceControl
             };
         }
 
+        public static GesturePartResult getResult()
+        {
+            return result;
+        }
+
         /// <summary>
         /// Updates the current gesture.
         /// </summary>
@@ -43,7 +50,7 @@ namespace ExercisesPerformanceControl
             int frames = skelList.Count;
             int frame = frames / _segments.Length;
 
-            GesturePartResult result = _segments[_currentSegment].Update(skeleton, skelList[frame * (_currentSegment + 1) - 1]);
+            result = _segments[_currentSegment].Update(skeleton, skelList[frame * (_currentSegment + 1) - 1]);
             Dictionary<JointType, int> jointsWithErrors = new Dictionary<JointType, int>();
 
             if (result == GesturePartResult.Succeeded)
@@ -77,6 +84,17 @@ namespace ExercisesPerformanceControl
                     Console.WriteLine(jointWithError.Key);
                 }
                 Reset();
+            }
+            else if (result == GesturePartResult.Uncertain)
+            {
+                jointsWithErrors = AnglesStorage.CompareAngles(
+                    Calculation.getAnglesInSkeletonJoints(skeleton),
+                    Calculation.getAnglesInSkeletonJoints(skelList[frame * (_currentSegment + 1) - 1]));
+                Console.WriteLine("The uncertainty is in the next joints:");
+                foreach (KeyValuePair<JointType, int> jointWithError in jointsWithErrors)
+                {
+                    Console.WriteLine(jointWithError.Key);
+                }
             }
             else if (_frameCount == WINDOW_SIZE)
             {
