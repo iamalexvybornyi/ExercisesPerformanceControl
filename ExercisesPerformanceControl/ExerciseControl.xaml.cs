@@ -323,6 +323,18 @@ namespace ExercisesPerformanceControl
             timerForReferenceMovement.Tick += new EventHandler(dispatcherTimer_TickReferenceMovement);
             timerForReferenceMovement.Interval = new TimeSpan(0, 0, 0, 0, 20);
             timerForReferenceMovement.Start();
+
+            String currentDirectory = System.IO.Directory.GetCurrentDirectory();
+            try
+            {
+                this.VideoControlTimeline.Source = new Uri(currentDirectory + "\\ExercisesData\\" + ExName + ".avi", UriKind.Absolute);
+                this.VideoControl.LoadedBehavior = MediaState.Manual;
+                this.VideoControl.Play();
+            }
+            catch
+            {
+
+            }
         }
 
         /// <summary>

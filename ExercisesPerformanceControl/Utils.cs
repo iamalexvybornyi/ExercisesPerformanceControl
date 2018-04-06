@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -22,6 +23,17 @@ namespace ExercisesPerformanceControl
                 bmp = new System.Drawing.Bitmap(outStream);
             }
             return bmp;
+        }
+
+        public static WriteableBitmap WriteableBitmapFromBitmap(System.Drawing.Bitmap bitmap)
+        {
+            System.Windows.Media.Imaging.BitmapSource bitmapSource = 
+                System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(
+                bitmap.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty,
+                System.Windows.Media.Imaging.BitmapSizeOptions.FromEmptyOptions());
+
+            System.Windows.Media.Imaging.WriteableBitmap writeableBitmap = new System.Windows.Media.Imaging.WriteableBitmap(bitmapSource);
+            return writeableBitmap;
         }
 
         public static void CreateThumbnailPNG(string filename, BitmapSource image5)
