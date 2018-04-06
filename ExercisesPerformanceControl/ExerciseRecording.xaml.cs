@@ -790,7 +790,7 @@ namespace ExercisesPerformanceControl
 
                 using (VideoFileWriter writer = new VideoFileWriter())
                 {
-                    writer.Open(fileLocation + NameOfTheExTextbox.Text + ".avi", 640, 480, 30, VideoCodec.MPEG4);
+                    writer.Open(fileLocation + ".avi", 640, 480, 30, VideoCodec.MPEG4);
                     var files = new DirectoryInfo(@"ExercisesData\Pics").GetFiles().OrderBy(f => f.LastWriteTime).ToList();
                     foreach (var file in files)
                     {
@@ -811,7 +811,6 @@ namespace ExercisesPerformanceControl
 
             System.GC.Collect();
             System.GC.WaitForPendingFinalizers(); 
-
             try
             {
                 System.IO.DirectoryInfo di = new DirectoryInfo(@"ExercisesData\Pics");
