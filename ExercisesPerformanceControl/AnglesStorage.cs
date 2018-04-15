@@ -153,5 +153,100 @@ namespace ExercisesPerformanceControl
                 return false;
             }
         }
+
+        public bool Equals(AnglesStorage other, ExerciseType type)
+        {
+            if (type == ExerciseType.LowerBody)
+            {
+                var KnL = Math.Abs(this.angleInLeftKnee - other.angleInLeftKnee);
+                var KnR = Math.Abs(this.angleInRightKnee - other.angleInRightKnee);
+
+                var HipCL = Math.Abs(this.angleInHipCenterLeft - other.angleInHipCenterLeft);
+                var HipCR = Math.Abs(this.angleInHipCenterRight - other.angleInHipCenterRight);
+
+                var HipR = Math.Abs(this.angleInRightHip - other.angleInRightHip);
+                var HipL = Math.Abs(this.angleInLeftHip - other.angleInLeftHip);
+
+                // Angles
+                if (KnL <= Helper.error &&
+                    KnR <= Helper.error &&
+                    HipCL <= Helper.error &&
+                    HipCR <= Helper.error &&
+                    HipR <= Helper.error &&
+                    HipL <= Helper.error)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else if (type == ExerciseType.UpperBody)
+            {
+                var ER = Math.Abs(this.angleInRightElbow - other.angleInRightElbow);
+                var EL = Math.Abs(this.angleInLeftElbow - other.angleInLeftElbow);
+                var ShR = Math.Abs(this.angleInRightShoulder - other.angleInRightShoulder);
+                var ShL = Math.Abs(this.angleInLeftShoulder - other.angleInLeftShoulder);
+
+                //var HipCL = Math.Abs(this.angleInHipCenterLeft - other.angleInHipCenterLeft);
+                //var HipCR = Math.Abs(this.angleInHipCenterRight - other.angleInHipCenterRight);
+
+                //var HipR = Math.Abs(this.angleInRightHip - other.angleInRightHip);
+                //var HipL = Math.Abs(this.angleInLeftHip - other.angleInLeftHip);
+
+                // Angles
+                if (ER <= Helper.error &&
+                    EL <= Helper.error &&
+                    ShR <= Helper.error &&
+                    ShL <= Helper.error)
+                    //HipCL <= Helper.error &&
+                    //HipCR <= Helper.error &&
+                    //HipR <= Helper.error &&
+                    //HipL <= Helper.error)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                var ER = Math.Abs(this.angleInRightElbow - other.angleInRightElbow);
+                var EL = Math.Abs(this.angleInLeftElbow - other.angleInLeftElbow);
+                var ShR = Math.Abs(this.angleInRightShoulder - other.angleInRightShoulder);
+                var ShL = Math.Abs(this.angleInLeftShoulder - other.angleInLeftShoulder);
+
+                var KnL = Math.Abs(this.angleInLeftKnee - other.angleInLeftKnee);
+                var KnR = Math.Abs(this.angleInRightKnee - other.angleInRightKnee);
+
+                var HipCL = Math.Abs(this.angleInHipCenterLeft - other.angleInHipCenterLeft);
+                var HipCR = Math.Abs(this.angleInHipCenterRight - other.angleInHipCenterRight);
+
+                var HipR = Math.Abs(this.angleInRightHip - other.angleInRightHip);
+                var HipL = Math.Abs(this.angleInLeftHip - other.angleInLeftHip);
+
+                // Angles
+                if (ER <= Helper.error &&
+                    EL <= Helper.error &&
+                    ShR <= Helper.error &&
+                    ShL <= Helper.error &&
+                    KnL <= Helper.error &&
+                    KnR <= Helper.error &&
+                    HipCL <= Helper.error &&
+                    HipCR <= Helper.error &&
+                    HipR <= Helper.error &&
+                    HipL <= Helper.error)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
     }
 }

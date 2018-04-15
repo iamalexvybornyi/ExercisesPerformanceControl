@@ -77,5 +77,56 @@ namespace ExercisesPerformanceControl
 
             return true;
         }
+
+        public bool Equals(JointPosComparisonResultStorage other, ExerciseType type)
+        {
+            if (type == ExerciseType.UpperBody)
+            {
+                if (this.LeftElbowLeftWrist != other.LeftElbowLeftWrist) return false;
+                if (this.LeftShoulderLeftElbow != other.LeftShoulderLeftElbow) return false;
+                if (this.LeftShoulderLeftWrist != other.LeftShoulderLeftWrist) return false;
+                if (this.RightElbowRightWrist != other.RightElbowRightWrist) return false;
+                if (this.RightShoulderRightElbow != other.RightShoulderRightElbow) return false;
+                if (this.RightShoulderRightWrist != other.RightShoulderRightWrist) return false;
+                if (this.ShoulderCenterHipCenter != other.ShoulderCenterHipCenter) return false;
+                if (this.ShoulderCenterSpine != other.ShoulderCenterSpine) return false;
+                if (this.SpineHipCenter != other.SpineHipCenter) return false;
+            }
+            else if (type == ExerciseType.LowerBody)
+            {
+                if (this.LeftHipLeftKneeX != other.LeftHipLeftKneeX) return false;
+                if (this.LeftHipLeftKneeY != other.LeftHipLeftKneeY) return false;
+                if (this.LeftKneeLeftAnkleX != other.LeftKneeLeftAnkleX) return false;
+                if (this.LeftKneeLeftAnkleY != other.LeftKneeLeftAnkleY) return false;
+                if (this.ShoulderCenterHipCenter != other.ShoulderCenterHipCenter) return false;
+                if (this.ShoulderCenterSpine != other.ShoulderCenterSpine) return false;
+                if (this.SpineHipCenter != other.SpineHipCenter) return false;
+
+            }
+            else if (type == ExerciseType.WholeBody)
+            {
+                if (this.LeftElbowLeftWrist != other.LeftElbowLeftWrist) return false;
+                if (this.LeftHipLeftKneeX != other.LeftHipLeftKneeX) return false;
+                if (this.LeftHipLeftKneeY != other.LeftHipLeftKneeY) return false;
+                if (this.LeftKneeLeftAnkleX != other.LeftKneeLeftAnkleX) return false;
+                if (this.LeftKneeLeftAnkleY != other.LeftKneeLeftAnkleY) return false;
+                if (this.LeftShoulderLeftElbow != other.LeftShoulderLeftElbow) return false;
+                if (this.LeftShoulderLeftWrist != other.LeftShoulderLeftWrist) return false;
+
+                if (this.RightElbowRightWrist != other.RightElbowRightWrist) return false;
+                if (this.RightHipRightKneeX != other.RightHipRightKneeX) return false;
+                if (this.RightHipRightKneeY != other.RightHipRightKneeY) return false;
+                if (this.RightKneeRightAnkleX != other.RightKneeRightAnkleX) return false;
+                if (this.RightKneeRightAnkleY != other.RightKneeRightAnkleY) return false;
+                if (this.RightShoulderRightElbow != other.RightShoulderRightElbow) return false;
+                if (this.RightShoulderRightWrist != other.RightShoulderRightWrist) return false;
+
+                if (this.ShoulderCenterHipCenter != other.ShoulderCenterHipCenter) return false;
+                if (this.ShoulderCenterSpine != other.ShoulderCenterSpine) return false;
+                if (this.SpineHipCenter != other.SpineHipCenter) return false;
+            }
+
+            return true;
+        }
     }
 }

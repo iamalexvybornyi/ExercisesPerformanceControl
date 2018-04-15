@@ -44,10 +44,10 @@ namespace ExercisesPerformanceControl
             JointPosComparisonResultStorage userRes = Calculation.ComparePositionsOfJoints(skeleton);
             JointPosComparisonResultStorage refRes = Calculation.ComparePositionsOfJoints(referenceSkeleton);
 
-            if (refRes.Equals(userRes))
+            if (refRes.Equals(userRes, ExerciseType.UpperBody))
             {
                 isInProgress = true;
-                if (anglesInReferenceSkeleton.Equals(anglesInUserSkeleton))
+                if (anglesInReferenceSkeleton.Equals(anglesInUserSkeleton, ExerciseType.UpperBody))
                 {
                     isInProgress = false;
                     //Console.WriteLine("Success");
@@ -58,7 +58,7 @@ namespace ExercisesPerformanceControl
                 //Console.WriteLine("Uncertain, in progress");
                 return GesturePartResult.Uncertain;
             }
-            else if (!refRes.Equals(userRes) && isInProgress)
+            else if (!refRes.Equals(userRes, ExerciseType.UpperBody) && isInProgress)
             {
                 isInProgress = false;
                 //Console.WriteLine("FAIL");
