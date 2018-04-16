@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Kinect;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -51,6 +52,33 @@ namespace ExercisesPerformanceControl
             RightHipRightKneeX = new JointPositionsComparisonResult();
             RightKneeRightAnkleX = new JointPositionsComparisonResult();
             RightKneeRightAnkleY = new JointPositionsComparisonResult();
+        }
+
+        public static List<JointType> CompareJointsPositions(JointPosComparisonResultStorage first, JointPosComparisonResultStorage second)
+        {
+            List<JointType> jointsWithErrors = new List<JointType>();
+            if (first.LeftElbowLeftWrist != second.LeftElbowLeftWrist) jointsWithErrors.Add(JointType.ElbowLeft);
+            if (first.LeftHipLeftKneeX != second.LeftHipLeftKneeX) jointsWithErrors.Add(JointType.HipLeft);
+            if (first.LeftHipLeftKneeY != second.LeftHipLeftKneeY) jointsWithErrors.Add(JointType.HipLeft);
+            if (first.LeftKneeLeftAnkleX != second.LeftKneeLeftAnkleX) jointsWithErrors.Add(JointType.KneeLeft);
+            if (first.LeftKneeLeftAnkleY != second.LeftKneeLeftAnkleY) jointsWithErrors.Add(JointType.KneeLeft);
+            if (first.LeftShoulderLeftElbow != second.LeftShoulderLeftElbow) jointsWithErrors.Add(JointType.ShoulderLeft);
+            if (first.LeftShoulderLeftWrist != second.LeftShoulderLeftWrist) jointsWithErrors.Add(JointType.WristLeft);
+
+            if (first.RightElbowRightWrist != second.RightElbowRightWrist) jointsWithErrors.Add(JointType.ElbowLeft);
+            if (first.RightHipRightKneeX != second.RightHipRightKneeX) jointsWithErrors.Add(JointType.HipRight);
+            if (first.RightHipRightKneeY != second.RightHipRightKneeY) jointsWithErrors.Add(JointType.HipRight);
+            if (first.RightKneeRightAnkleX != second.RightKneeRightAnkleX) jointsWithErrors.Add(JointType.KneeRight);
+            if (first.RightKneeRightAnkleY != second.RightKneeRightAnkleY) jointsWithErrors.Add(JointType.KneeRight);
+            if (first.RightShoulderRightElbow != second.RightShoulderRightElbow) jointsWithErrors.Add(JointType.ShoulderRight);
+            if (first.RightShoulderRightWrist != second.RightShoulderRightWrist) jointsWithErrors.Add(JointType.WristRight);
+
+            if (first.ShoulderCenterHipCenter != second.ShoulderCenterHipCenter) jointsWithErrors.Add(JointType.ShoulderCenter);
+            if (first.ShoulderCenterSpine != second.ShoulderCenterSpine) jointsWithErrors.Add(JointType.Spine);
+            if (first.SpineHipCenter != second.SpineHipCenter) jointsWithErrors.Add(JointType.HipCenter);
+
+            List<JointType> jointsWithErrorsWithoutDuplicates = jointsWithErrors.Distinct().ToList();
+            return jointsWithErrorsWithoutDuplicates;
         }
 
         public bool Equals(JointPosComparisonResultStorage other)

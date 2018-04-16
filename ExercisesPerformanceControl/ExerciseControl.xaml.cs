@@ -78,7 +78,7 @@ namespace ExercisesPerformanceControl
 
         private List<Skeleton> skelListUser = new List<Skeleton>();
 
-        Dictionary<JointType, int> dictWIthCurrentlyFailedJoints = new Dictionary<JointType, int>();
+        List<JointType> listWIthCurrentlyFailedJoints = new List<JointType>();
 
         /// <summary>
         /// Skeleton data list to record a movement
@@ -136,6 +136,11 @@ namespace ExercisesPerformanceControl
         /// Thickness of drawn joint lines
         /// </summary>
         private double JointThickness = 3;
+
+        /// <summary>
+        /// Thickness of drawn joint lines for joints with errors
+        /// </summary>
+        private double JointThicknessForFailedJoints = 15;
 
         /// <summary>
         /// Thickness of body center ellipse
@@ -608,7 +613,7 @@ namespace ExercisesPerformanceControl
                                 skelIsTracked = true;
                             }
 
-                            Dictionary<JointType, int> jointsWithErrors = _gesture.Update(skel, skelList);
+                            List<JointType> jointsWithErrors = _gesture.Update(skel, skelList);
 
                             this.DrawBonesAndJoints(skel, dc, jointsWithErrors);
 
@@ -686,7 +691,7 @@ namespace ExercisesPerformanceControl
         /// </summary>
         /// <param name="skeleton">skeleton to draw</param>
         /// <param name="drawingContext">drawing context to draw to</param>
-        private void DrawBonesAndJoints(Skeleton skeleton, DrawingContext drawingContext, Dictionary<JointType, int> jointsWithErrors)
+        private void DrawBonesAndJoints(Skeleton skeleton, DrawingContext drawingContext, List<JointType> jointsWithErrors)
         {
             // Render Torso
             this.DrawBone(skeleton, drawingContext, JointType.Head, JointType.ShoulderCenter);
@@ -741,22 +746,22 @@ namespace ExercisesPerformanceControl
             if (jointsWithErrors.Count > 0)
             {
                 framesToShowErrors = 20;
-                dictWIthCurrentlyFailedJoints = jointsWithErrors;
+                listWIthCurrentlyFailedJoints = jointsWithErrors;
             }
 
             if (framesToShowErrors > 0)
             {
                 Brush drawBrushForFailedJoints = null;
-                foreach (KeyValuePair<JointType, int> jointWithError in dictWIthCurrentlyFailedJoints)
+                foreach (var jointWithError in listWIthCurrentlyFailedJoints)
                 {
-                    JointThickness = 15;
+                    //JointThickness = 15;
                     drawBrushForFailedJoints = this.failedJointBrush;
-                    drawingContext.DrawEllipse(drawBrushForFailedJoints, null, this.SkeletonPointToScreen(skeleton.Joints[jointWithError.Key].Position), JointThickness, JointThickness);
+                    drawingContext.DrawEllipse(drawBrushForFailedJoints, null, this.SkeletonPointToScreen(skeleton.Joints[jointWithError].Position), JointThicknessForFailedJoints, JointThicknessForFailedJoints);
                 }
                 framesToShowErrors--;
                 if (framesToShowErrors == 0)
                 {
-                    dictWIthCurrentlyFailedJoints.Clear();
+                    listWIthCurrentlyFailedJoints.Clear();
                 }
             }
         }
