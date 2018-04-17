@@ -19,7 +19,7 @@ namespace ExercisesPerformanceControl
         /// <param name="skeleton">The skeleton.</param>
         /// <returns>A GesturePartResult based on whether the gesture part has been completed.</returns>
         /// 
-        GesturePartResult Update(Skeleton skeleton, Skeleton referenceSkeleton);
+        GesturePartResult Update(Skeleton skeleton, Skeleton referenceSkeleton, ExerciseType exType);
     }
 
     public class Helper
@@ -36,7 +36,7 @@ namespace ExercisesPerformanceControl
         /// </summary>
         /// <param name="skeleton">The skeleton.</param>
         /// <returns>A GesturePartResult based on whether the gesture part has been completed.</returns>
-        public GesturePartResult Update(Skeleton skeleton, Skeleton referenceSkeleton)
+        public GesturePartResult Update(Skeleton skeleton, Skeleton referenceSkeleton, ExerciseType exType)
         {
             AnglesStorage anglesInUserSkeleton = Calculation.getAnglesInSkeletonJoints(skeleton);
             AnglesStorage anglesInReferenceSkeleton = Calculation.getAnglesInSkeletonJoints(referenceSkeleton);
@@ -44,10 +44,10 @@ namespace ExercisesPerformanceControl
             JointPosComparisonResultStorage userRes = Calculation.ComparePositionsOfJoints(skeleton);
             JointPosComparisonResultStorage refRes = Calculation.ComparePositionsOfJoints(referenceSkeleton);
 
-            if (refRes.Equals(userRes, ExerciseType.UpperBody))
+            if (refRes.Equals(userRes, exType))
             {
                 isInProgress = true;
-                if (anglesInReferenceSkeleton.Equals(anglesInUserSkeleton, ExerciseType.UpperBody))
+                if (anglesInReferenceSkeleton.Equals(anglesInUserSkeleton, exType))
                 {
                     isInProgress = false;
                     //Console.WriteLine("Success");
@@ -58,7 +58,7 @@ namespace ExercisesPerformanceControl
                 //Console.WriteLine("Uncertain, in progress");
                 return GesturePartResult.Uncertain;
             }
-            else if (!refRes.Equals(userRes, ExerciseType.UpperBody) && isInProgress)
+            else if (!refRes.Equals(userRes, exType) && isInProgress)
             {
                 isInProgress = false;
                 //Console.WriteLine("FAIL");

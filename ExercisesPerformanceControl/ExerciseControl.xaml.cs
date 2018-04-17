@@ -613,7 +613,7 @@ namespace ExercisesPerformanceControl
                                 skelIsTracked = true;
                             }
 
-                            List<JointType> jointsWithErrors = _gesture.Update(skel, skelList);
+                            List<JointType> jointsWithErrors = _gesture.Update(skel, skelList, ExerciseType.UpperBody);
 
                             this.DrawBonesAndJoints(skel, dc, jointsWithErrors);
 
@@ -746,6 +746,7 @@ namespace ExercisesPerformanceControl
             if (jointsWithErrors.Count > 0)
             {
                 framesToShowErrors = 20;
+                listWIthCurrentlyFailedJoints.Clear();
                 listWIthCurrentlyFailedJoints = jointsWithErrors;
             }
 
