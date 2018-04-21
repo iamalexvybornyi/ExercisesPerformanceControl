@@ -1,6 +1,7 @@
 ﻿using Microsoft.Kinect;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ExercisesPerformanceControl
 {
@@ -38,13 +39,13 @@ namespace ExercisesPerformanceControl
         /// Updates the current gesture.
         /// </summary>
         /// <param name="skeleton">The skeleton data.</param>
-        public Dictionary<JointType, int> Update(Skeleton skeleton, List<Skeleton> skelList)
+        public List<JointType> Update(Skeleton skeleton, List<Skeleton> skelList, ExerciseType exType)
         {
             int frames = skelList.Count;
             int frame = frames / _segments.Length;
 
-            GesturePartResult result = _segments[_currentSegment].Update(skeleton, skelList[frame * (_currentSegment + 1) - 1]);
-            Dictionary<JointType, int> jointsWithErrors = new Dictionary<JointType, int>();
+            GesturePartResult result = _segments[_currentSegment].Update(skeleton, skelList[frame * (_currentSegment + 1) - 1], exType);
+            List<JointType> jointsWithErrorsFinalList = new List<JointType>();
 
             if (result == GesturePartResult.Succeeded)
             {
@@ -68,19 +69,48 @@ namespace ExercisesPerformanceControl
             {
                 Console.WriteLine("@@@@@@@@@@@@@@@@@=======WRONG MOVEMENT=======@@@@@@@@@@@@@@@@@");
                 Console.WriteLine("@@@@@@@@@@@@@@@@@=======Error in segment " + _currentSegment + "=======@@@@@@@@@@@@@@@@@");
-                jointsWithErrors = AnglesStorage.CompareAngles(
+
+                JointPosComparisonResultStorage userRes = Calculation.ComparePositionsOfJoints(skeleton);
+                JointPosComparisonResultStorage refRes = Calculation.ComparePositionsOfJoints(skelList[frame * (_currentSegment + 1) - 1]);
+                List<JointType> jointsWithPosErrors = JointPosComparisonResultStorage.CompareJointsPositions(userRes, refRes, exType);
+
+                Dictionary<JointType, int> jointsWithErrors = AnglesStorage.CompareAngles(
                     Calculation.getAnglesInSkeletonJoints(skeleton),
-                    Calculation.getAnglesInSkeletonJoints(skelList[frame * (_currentSegment + 1) - 1]));
+                    Calculation.getAnglesInSkeletonJoints(skelList[frame * (_currentSegment + 1) - 1]),
+                    exType);
+
+                List<JointType> jointsWithAnglesErrors = jointsWithErrors.Keys.ToList();
+                List<JointType> resListWithPossibleDuplicates = jointsWithPosErrors.Concat(jointsWithAnglesErrors).ToList();
+                jointsWithErrorsFinalList = resListWithPossibleDuplicates.Distinct().ToList();
+
                 Console.WriteLine("The errors are in next joints:");
-                foreach (KeyValuePair<JointType, int> jointWithError in jointsWithErrors)
+                foreach (var jointWithError in jointsWithErrorsFinalList)
                 {
-                    Console.WriteLine(jointWithError.Key);
+                    Console.WriteLine(jointWithError);
                 }
                 Reset();
             }
             else if (_frameCount == WINDOW_SIZE)
             {
                 Console.WriteLine("@@@@@@@@@@@@@@@@@=======TOO SLOW=======@@@@@@@@@@@@@@@@@");
+                JointPosComparisonResultStorage userRes = Calculation.ComparePositionsOfJoints(skeleton);
+                JointPosComparisonResultStorage refRes = Calculation.ComparePositionsOfJoints(skelList[frame * (_currentSegment + 1) - 1]);
+                List<JointType> jointsWithPosErrors = JointPosComparisonResultStorage.CompareJointsPositions(userRes, refRes, exType);
+
+                Dictionary<JointType, int> jointsWithErrors = AnglesStorage.CompareAngles(
+                    Calculation.getAnglesInSkeletonJoints(skeleton),
+                    Calculation.getAnglesInSkeletonJoints(skelList[frame * (_currentSegment + 1) - 1]),
+                    exType);
+
+                List<JointType> jointsWithAnglesErrors = jointsWithErrors.Keys.ToList();
+                List<JointType> resListWithPossibleDuplicates = jointsWithPosErrors.Concat(jointsWithAnglesErrors).ToList();
+                jointsWithErrorsFinalList = resListWithPossibleDuplicates.Distinct().ToList();
+
+                Console.WriteLine("The errors are in next joints:");
+                foreach (var jointWithError in jointsWithErrorsFinalList)
+                {
+                    Console.WriteLine(jointWithError);
+                }
                 Reset();
             }
             else
@@ -88,7 +118,7 @@ namespace ExercisesPerformanceControl
                 _frameCount++;
             }
 
-            return jointsWithErrors;
+            return jointsWithErrorsFinalList;
         }
 
         /// <summary>
