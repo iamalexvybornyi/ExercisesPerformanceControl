@@ -103,15 +103,35 @@ namespace ExercisesPerformanceControl
             angleInLeftAnkle = new double();
         }
 
-        public static Dictionary<JointType, int> CompareAngles(AnglesStorage first, AnglesStorage second)
+        public static Dictionary<JointType, int> CompareAngles(AnglesStorage first, AnglesStorage second, ExerciseType exType)
         {
             Dictionary<JointType, int> anglesDifference = new Dictionary<JointType, int>();
-            anglesDifference.Add(JointType.ElbowRight, Convert.ToInt32(Math.Abs(first.angleInRightElbow - second.angleInRightElbow)));
-            anglesDifference.Add(JointType.ElbowLeft, Convert.ToInt32(Math.Abs(first.angleInLeftElbow - second.angleInLeftElbow)));
-            anglesDifference.Add(JointType.ShoulderRight, Convert.ToInt32(Math.Abs(first.angleInRightShoulder - second.angleInRightShoulder)));
-            anglesDifference.Add(JointType.ShoulderLeft, Convert.ToInt32(Math.Abs(first.angleInLeftShoulder - second.angleInLeftShoulder)));
-            anglesDifference.Add(JointType.KneeLeft, Convert.ToInt32(Math.Abs(first.angleInLeftKnee - second.angleInLeftKnee)));
-            anglesDifference.Add(JointType.KneeRight, Convert.ToInt32(Math.Abs(first.angleInRightKnee - second.angleInRightKnee)));
+
+            if (exType == ExerciseType.WholeBody)
+            {
+                anglesDifference.Add(JointType.ElbowRight, Convert.ToInt32(Math.Abs(first.angleInRightElbow - second.angleInRightElbow)));
+                anglesDifference.Add(JointType.ElbowLeft, Convert.ToInt32(Math.Abs(first.angleInLeftElbow - second.angleInLeftElbow)));
+                anglesDifference.Add(JointType.ShoulderRight, Convert.ToInt32(Math.Abs(first.angleInRightShoulder - second.angleInRightShoulder)));
+                anglesDifference.Add(JointType.ShoulderLeft, Convert.ToInt32(Math.Abs(first.angleInLeftShoulder - second.angleInLeftShoulder)));
+                anglesDifference.Add(JointType.KneeLeft, Convert.ToInt32(Math.Abs(first.angleInLeftKnee - second.angleInLeftKnee)));
+                anglesDifference.Add(JointType.KneeRight, Convert.ToInt32(Math.Abs(first.angleInRightKnee - second.angleInRightKnee)));
+                anglesDifference.Add(JointType.HipLeft, Convert.ToInt32(Math.Abs(first.angleInLeftHip - second.angleInLeftHip)));
+                anglesDifference.Add(JointType.HipRight, Convert.ToInt32(Math.Abs(first.angleInRightHip - second.angleInRightHip)));
+            }
+            else if (exType == ExerciseType.UpperBody)
+            {
+                anglesDifference.Add(JointType.ElbowRight, Convert.ToInt32(Math.Abs(first.angleInRightElbow - second.angleInRightElbow)));
+                anglesDifference.Add(JointType.ElbowLeft, Convert.ToInt32(Math.Abs(first.angleInLeftElbow - second.angleInLeftElbow)));
+                anglesDifference.Add(JointType.ShoulderRight, Convert.ToInt32(Math.Abs(first.angleInRightShoulder - second.angleInRightShoulder)));
+                anglesDifference.Add(JointType.ShoulderLeft, Convert.ToInt32(Math.Abs(first.angleInLeftShoulder - second.angleInLeftShoulder)));
+            }
+            else if (exType == ExerciseType.LowerBody)
+            {
+                anglesDifference.Add(JointType.KneeLeft, Convert.ToInt32(Math.Abs(first.angleInLeftKnee - second.angleInLeftKnee)));
+                anglesDifference.Add(JointType.KneeRight, Convert.ToInt32(Math.Abs(first.angleInRightKnee - second.angleInRightKnee)));
+                anglesDifference.Add(JointType.HipLeft, Convert.ToInt32(Math.Abs(first.angleInLeftHip - second.angleInLeftHip)));
+                anglesDifference.Add(JointType.HipRight, Convert.ToInt32(Math.Abs(first.angleInRightHip - second.angleInRightHip)));
+            }
 
             anglesDifference = anglesDifference.Where(p => p.Value > Helper.error).ToDictionary(p => p.Key, p => p.Value);
 
@@ -151,6 +171,101 @@ namespace ExercisesPerformanceControl
             else
             {
                 return false;
+            }
+        }
+
+        public bool Equals(AnglesStorage other, ExerciseType type)
+        {
+            if (type == ExerciseType.LowerBody)
+            {
+                var KnL = Math.Abs(this.angleInLeftKnee - other.angleInLeftKnee);
+                var KnR = Math.Abs(this.angleInRightKnee - other.angleInRightKnee);
+
+                var HipCL = Math.Abs(this.angleInHipCenterLeft - other.angleInHipCenterLeft);
+                var HipCR = Math.Abs(this.angleInHipCenterRight - other.angleInHipCenterRight);
+
+                var HipR = Math.Abs(this.angleInRightHip - other.angleInRightHip);
+                var HipL = Math.Abs(this.angleInLeftHip - other.angleInLeftHip);
+
+                // Angles
+                if (KnL <= Helper.error &&
+                    KnR <= Helper.error &&
+                    HipCL <= Helper.error &&
+                    HipCR <= Helper.error &&
+                    HipR <= Helper.error &&
+                    HipL <= Helper.error)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else if (type == ExerciseType.UpperBody)
+            {
+                var ER = Math.Abs(this.angleInRightElbow - other.angleInRightElbow);
+                var EL = Math.Abs(this.angleInLeftElbow - other.angleInLeftElbow);
+                var ShR = Math.Abs(this.angleInRightShoulder - other.angleInRightShoulder);
+                var ShL = Math.Abs(this.angleInLeftShoulder - other.angleInLeftShoulder);
+
+                //var HipCL = Math.Abs(this.angleInHipCenterLeft - other.angleInHipCenterLeft);
+                //var HipCR = Math.Abs(this.angleInHipCenterRight - other.angleInHipCenterRight);
+
+                //var HipR = Math.Abs(this.angleInRightHip - other.angleInRightHip);
+                //var HipL = Math.Abs(this.angleInLeftHip - other.angleInLeftHip);
+
+                // Angles
+                if (ER <= Helper.error &&
+                    EL <= Helper.error &&
+                    ShR <= Helper.error &&
+                    ShL <= Helper.error)
+                    //HipCL <= Helper.error &&
+                    //HipCR <= Helper.error &&
+                    //HipR <= Helper.error &&
+                    //HipL <= Helper.error)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                var ER = Math.Abs(this.angleInRightElbow - other.angleInRightElbow);
+                var EL = Math.Abs(this.angleInLeftElbow - other.angleInLeftElbow);
+                var ShR = Math.Abs(this.angleInRightShoulder - other.angleInRightShoulder);
+                var ShL = Math.Abs(this.angleInLeftShoulder - other.angleInLeftShoulder);
+
+                var KnL = Math.Abs(this.angleInLeftKnee - other.angleInLeftKnee);
+                var KnR = Math.Abs(this.angleInRightKnee - other.angleInRightKnee);
+
+                var HipCL = Math.Abs(this.angleInHipCenterLeft - other.angleInHipCenterLeft);
+                var HipCR = Math.Abs(this.angleInHipCenterRight - other.angleInHipCenterRight);
+
+                var HipR = Math.Abs(this.angleInRightHip - other.angleInRightHip);
+                var HipL = Math.Abs(this.angleInLeftHip - other.angleInLeftHip);
+
+                // Angles
+                if (ER <= Helper.error &&
+                    EL <= Helper.error &&
+                    ShR <= Helper.error &&
+                    ShL <= Helper.error &&
+                    KnL <= Helper.error &&
+                    KnR <= Helper.error &&
+                    HipCL <= Helper.error &&
+                    HipCR <= Helper.error &&
+                    HipR <= Helper.error &&
+                    HipL <= Helper.error)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
             }
         }
     }
