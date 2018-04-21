@@ -11,6 +11,7 @@
         </Viewbox>
         <Button Name="StartBtn" Content="Начать запись" VerticalAlignment="Bottom" HorizontalAlignment="Left" Height="66" Click="StartBtn_Click"/>
         <Button Name="StopBtn" Content="Остановить запись" VerticalAlignment="Bottom" HorizontalAlignment="Left" Height="66" Margin="88,0,0,0" Click="StopBtn_Click"/>
+        <Label FontSize="18" Name="AmountOfFramesLabel" Content="Кол-во кадров: " VerticalAlignment="Bottom" Margin="201,0,663,0" Height="46"></Label>
         <Label FontSize="12" Name="StartingFrameLabel" Content="Начальный кадр" VerticalAlignment="Bottom" Margin="373,0,533,40" Height="26"></Label>
         <TextBox Name="StartingFrameTextbox" VerticalAlignment="Bottom" Margin="373,0,533,9" Height="26"/>
         <Label FontSize="12" Name="EndingFrameLabel" Content="Конечный кадр" VerticalAlignment="Bottom" Margin="483,0,428,40" Height="26"></Label>
@@ -19,11 +20,5 @@
         <Label FontSize="12" Name="NameOfTheExLabel" Content="Название упражнения" VerticalAlignment="Bottom" Margin="693,0,177,40" Height="26"></Label>
         <TextBox Name="NameOfTheExTextbox" VerticalAlignment="Bottom" Margin="693,0,177,9" Height="26"/>
         <Button Content="Сохранить" Name="SaveBtn" VerticalAlignment="Bottom" Margin="844,0,0,0" Height="66" Click="SaveBtn_Click"></Button>
-        <ComboBox Name="ExerciseTypeComboBox" HorizontalAlignment="Left" Margin="201,629,0,0" VerticalAlignment="Top" Width="167" Height="26">
-            <ComboBoxItem Name="UpperBody">Верхняя часть тела</ComboBoxItem>
-            <ComboBoxItem Name="LowerBody" IsSelected="True">Нижняя часть тела</ComboBoxItem>
-            <ComboBoxItem Name="WholeBody">Всё тело</ComboBoxItem>
-        </ComboBox>
-        <Label FontSize="12" Name="ExTypeLabel" Content="Тип упражнения" VerticalAlignment="Bottom" Margin="201,0,648,40" Height="26"/>
     </Grid>
 </Window>

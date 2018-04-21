@@ -19,7 +19,7 @@ namespace ExercisesPerformanceControl
         /// <param name="skeleton">The skeleton.</param>
         /// <returns>A GesturePartResult based on whether the gesture part has been completed.</returns>
         /// 
-        GesturePartResult Update(Skeleton skeleton, Skeleton referenceSkeleton, ExerciseType exType);
+        GesturePartResult Update(Skeleton skeleton, Skeleton referenceSkeleton);
     }
 
     public class Helper
@@ -36,7 +36,7 @@ namespace ExercisesPerformanceControl
         /// </summary>
         /// <param name="skeleton">The skeleton.</param>
         /// <returns>A GesturePartResult based on whether the gesture part has been completed.</returns>
-        public GesturePartResult Update(Skeleton skeleton, Skeleton referenceSkeleton, ExerciseType exType)
+        public GesturePartResult Update(Skeleton skeleton, Skeleton referenceSkeleton)
         {
             AnglesStorage anglesInUserSkeleton = Calculation.getAnglesInSkeletonJoints(skeleton);
             AnglesStorage anglesInReferenceSkeleton = Calculation.getAnglesInSkeletonJoints(referenceSkeleton);
@@ -44,10 +44,10 @@ namespace ExercisesPerformanceControl
             JointPosComparisonResultStorage userRes = Calculation.ComparePositionsOfJoints(skeleton);
             JointPosComparisonResultStorage refRes = Calculation.ComparePositionsOfJoints(referenceSkeleton);
 
-            if (refRes.Equals(userRes, exType))
+            if (refRes.Equals(userRes))
             {
                 isInProgress = true;
-                if (anglesInReferenceSkeleton.Equals(anglesInUserSkeleton, exType))
+                if (anglesInReferenceSkeleton.Equals(anglesInUserSkeleton))
                 {
                     isInProgress = false;
                     //Console.WriteLine("Success");
@@ -58,7 +58,7 @@ namespace ExercisesPerformanceControl
                 //Console.WriteLine("Uncertain, in progress");
                 return GesturePartResult.Uncertain;
             }
-            else if (!refRes.Equals(userRes, exType) && isInProgress)
+            else if (!refRes.Equals(userRes) && isInProgress)
             {
                 isInProgress = false;
                 //Console.WriteLine("FAIL");
