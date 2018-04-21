@@ -131,54 +131,6 @@ namespace ExercisesPerformanceControl
             return Motion;
         }
 
-        public static void WriteToFile(SerializableExercise exercise, String fileLocation)
-        {
-            Stream stream = null;
-
-            // Write skeleton data to file using serialization
-            try
-            {
-                BinaryFormatter bFormatter = new BinaryFormatter();
-                stream = new FileStream(fileLocation, FileMode.CreateNew, FileAccess.Write, FileShare.None);
-                bFormatter.Serialize(stream, exercise);
-            }
-            catch (Exception ex)
-            {
-                ex.ToString();
-            }
-            finally
-            {
-                if (stream != null)
-                    stream.Close();
-            }
-        }
-
-        public static SerializableExercise ReadFromFile(String exText)
-        {
-            SerializableExercise Motion = null;
-            Stream stream = null;
-            String fileLocation = @"ExercisesData\" + exText + ".xrs";
-
-            // Read file using deserialization
-            try
-            {
-                Motion = new SerializableExercise();
-                BinaryFormatter bFormatter = new BinaryFormatter();
-                stream = File.Open(fileLocation, FileMode.Open);
-                Motion = (SerializableExercise)bFormatter.Deserialize(stream);
-            }
-            catch (Exception ex)
-            {
-                ex.ToString();
-            }
-            if (stream != null)
-            {
-                stream.Close();
-            }
-
-            return Motion;
-        }
-
         /*
         /// <summary>
         ///  Write BackgroundRemoved data to file

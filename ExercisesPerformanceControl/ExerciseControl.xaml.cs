@@ -78,7 +78,12 @@ namespace ExercisesPerformanceControl
 
         private List<Skeleton> skelListUser = new List<Skeleton>();
 
-        List<JointType> listWIthCurrentlyFailedJoints = new List<JointType>();
+        Dictionary<JointType, int> dictWIthCurrentlyFailedJoints = new Dictionary<JointType, int>();
+
+        /// <summary>
+        /// Skeleton data list to record a movement
+        /// </summary>
+        private List<Skeleton> skelListForRecording = new List<Skeleton>();
 
         /// <summary>
         /// Flag with info about whether the Silhouette data was recorded or not
@@ -133,9 +138,9 @@ namespace ExercisesPerformanceControl
         private double JointThickness = 3;
 
         /// <summary>
-        /// Thickness of drawn joint lines for joints with errors
+        /// Thickness of drawn failed joint lines
         /// </summary>
-        private double JointThicknessForFailedJoints = 15;
+        private double FailedJointThickness = 15;
 
         /// <summary>
         /// Thickness of body center ellipse
@@ -216,14 +221,11 @@ namespace ExercisesPerformanceControl
         DispatcherTimer timerForUserData = new DispatcherTimer();
 
         List<List<Point>> pointsList = new List<List<Point>>();
+        List<List<Point>> pointsListUser = new List<List<Point>>();
 
         static ExerciseGesture _gesture = new ExerciseGesture();
 
         int framesToShowErrors = 0;
-
-        SerializableExercise exerciseData;
-
-        ExerciseType exerciseType;
 
 
         public ExerciseControl()
@@ -314,10 +316,8 @@ namespace ExercisesPerformanceControl
 
             _gesture.GestureRecognized += Gesture_GestureRecognized;
 
-            exerciseData = FileRW.ReadFromFile(ExName);
-
             // Get all the skeleton data of an exercise
-            skelList = exerciseData.GetSkelData();
+            skelList = FileRW.ReadSkelDataFromFile(ExName);
             frames = skelList.Count;
 
             // Check if the files have been read correctly
@@ -328,9 +328,7 @@ namespace ExercisesPerformanceControl
             }
 
             pointsList.Clear();
-            pointsList = exerciseData.GetSkelPointsData();
-
-            exerciseType = exerciseData.GetExerciseType();
+            pointsList = FileRW.ReadPointsDataFromFile(ExName);
 
             timerForReferenceMovement.Tick += new EventHandler(dispatcherTimer_TickReferenceMovement);
             timerForReferenceMovement.Interval = new TimeSpan(0, 0, 0, 0, 20);
@@ -620,9 +618,23 @@ namespace ExercisesPerformanceControl
                                 skelIsTracked = true;
                             }
 
-                            List<JointType> jointsWithErrors = _gesture.Update(skel, skelList, exerciseType);
+                            Dictionary<JointType, int> jointsWithErrors = _gesture.Update(skel, skelList);
 
                             this.DrawBonesAndJoints(skel, dc, jointsWithErrors);
+
+                            // All these commented lines below were used to record exercises. That's why they're still here.
+                            
+                            //Write skeleton data of an exercise to file
+                            //if (skelListForRecording.Count() < 250)
+                            //{
+                            //    skelListForRecording.Add(skel);
+                            //}
+                            //else if (Written == false)
+                            //{
+                            //    string fileLocation = "Input8.txt";
+                            //    FileRW.WriteSkelDataToFile(skelListForRecording, fileLocation);
+                            //    Written = true;
+                            //}
                             
                         }
                         else if (skel.TrackingState == SkeletonTrackingState.PositionOnly && currentlyTrackedSkeletonId == skel.TrackingId)
@@ -684,7 +696,7 @@ namespace ExercisesPerformanceControl
         /// </summary>
         /// <param name="skeleton">skeleton to draw</param>
         /// <param name="drawingContext">drawing context to draw to</param>
-        private void DrawBonesAndJoints(Skeleton skeleton, DrawingContext drawingContext, List<JointType> jointsWithErrors)
+        private void DrawBonesAndJoints(Skeleton skeleton, DrawingContext drawingContext, Dictionary<JointType, int> jointsWithErrors)
         {
             // Render Torso
             this.DrawBone(skeleton, drawingContext, JointType.Head, JointType.ShoulderCenter);
@@ -750,23 +762,22 @@ namespace ExercisesPerformanceControl
 
             if (jointsWithErrors.Count > 0 && tmpRes == GesturePartResult.Failed)
             {
-                framesToShowErrors = 20;
-                listWIthCurrentlyFailedJoints.Clear();
-                listWIthCurrentlyFailedJoints = jointsWithErrors;
+                framesToShowErrors = 15;
+                dictWIthCurrentlyFailedJoints = jointsWithErrors;
             }
 
             if (framesToShowErrors > 0)
             {
                 Brush drawBrushForFailedJoints = null;
-                foreach (var jointWithError in listWIthCurrentlyFailedJoints)
+                foreach (KeyValuePair<JointType, int> jointWithError in dictWIthCurrentlyFailedJoints)
                 {
                     drawBrushForFailedJoints = this.failedJointBrush;
-                    drawingContext.DrawEllipse(drawBrushForFailedJoints, null, this.SkeletonPointToScreen(skeleton.Joints[jointWithError].Position), JointThicknessForFailedJoints, JointThicknessForFailedJoints);
+                    drawingContext.DrawEllipse(drawBrushForFailedJoints, null, this.SkeletonPointToScreen(skeleton.Joints[jointWithError.Key].Position), FailedJointThickness, FailedJointThickness);
                 }
                 framesToShowErrors--;
                 if (framesToShowErrors == 0)
                 {
-                    listWIthCurrentlyFailedJoints.Clear();
+                    dictWIthCurrentlyFailedJoints.Clear();
                 }
             }
         }
