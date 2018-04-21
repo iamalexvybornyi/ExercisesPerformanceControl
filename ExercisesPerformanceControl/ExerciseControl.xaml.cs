@@ -168,6 +168,11 @@ namespace ExercisesPerformanceControl
         private readonly Brush failedJointBrush = Brushes.Red;
 
         /// <summary>
+        /// Brush used for drawing joints that are currently in uncertain state
+        /// </summary>        
+        private readonly Brush uncertainJointBrush = Brushes.Yellow;
+
+        /// <summary>
         /// Pen used for drawing bones that are currently tracked
         /// </summary>
         private readonly Pen trackedBonePen = new Pen(Brushes.Green, 10);
@@ -731,7 +736,19 @@ namespace ExercisesPerformanceControl
                 }
             }
 
-            if (jointsWithErrors.Count > 0)
+            GesturePartResult tmpRes = ExerciseGesture.getResult();
+
+            if (tmpRes == GesturePartResult.Uncertain || framesToShowErrors!=0)
+            {
+                Brush drawBrushForUncertainJoints = null;
+                foreach (KeyValuePair<JointType, int> jointWithError in jointsWithErrors)
+                {
+                    drawBrushForUncertainJoints = this.uncertainJointBrush;
+                    drawingContext.DrawEllipse(drawBrushForUncertainJoints, null, this.SkeletonPointToScreen(skeleton.Joints[jointWithError.Key].Position), FailedJointThickness, FailedJointThickness);
+                }
+            }
+
+            if (jointsWithErrors.Count > 0 && tmpRes == GesturePartResult.Failed)
             {
                 framesToShowErrors = 20;
                 listWIthCurrentlyFailedJoints.Clear();
@@ -743,7 +760,6 @@ namespace ExercisesPerformanceControl
                 Brush drawBrushForFailedJoints = null;
                 foreach (var jointWithError in listWIthCurrentlyFailedJoints)
                 {
-                    //JointThickness = 15;
                     drawBrushForFailedJoints = this.failedJointBrush;
                     drawingContext.DrawEllipse(drawBrushForFailedJoints, null, this.SkeletonPointToScreen(skeleton.Joints[jointWithError].Position), JointThicknessForFailedJoints, JointThicknessForFailedJoints);
                 }

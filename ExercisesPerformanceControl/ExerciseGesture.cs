@@ -11,6 +11,8 @@ namespace ExercisesPerformanceControl
 
         IGestureSegment[] _segments;
 
+        private static GesturePartResult result;
+
         int _currentSegment = 0;
         int _frameCount = 0;
 
@@ -33,6 +35,11 @@ namespace ExercisesPerformanceControl
                 exerciseSegment,
                 exerciseSegment
             };
+        }
+
+        public static GesturePartResult getResult()
+        {
+            return result;
         }
 
         /// <summary>
@@ -89,6 +96,17 @@ namespace ExercisesPerformanceControl
                     Console.WriteLine(jointWithError);
                 }
                 Reset();
+            }
+            else if (result == GesturePartResult.Uncertain)
+            {
+                jointsWithErrors = AnglesStorage.CompareAngles(
+                    Calculation.getAnglesInSkeletonJoints(skeleton),
+                    Calculation.getAnglesInSkeletonJoints(skelList[frame * (_currentSegment + 1) - 1]));
+                Console.WriteLine("The uncertainty is in the next joints:");
+                foreach (KeyValuePair<JointType, int> jointWithError in jointsWithErrors)
+                {
+                    Console.WriteLine(jointWithError.Key);
+                }
             }
             else if (_frameCount == WINDOW_SIZE)
             {
