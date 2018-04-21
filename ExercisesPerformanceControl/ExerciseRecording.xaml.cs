@@ -250,8 +250,7 @@ namespace ExercisesPerformanceControl
             }
 
             // Set type of the exercise
-            // TODO: get type of the exercise from UI
-            exerciseType = ExerciseType.UpperBody;
+            exerciseType = (ExerciseType)Enum.Parse(typeof(ExerciseType), ((ComboBoxItem)this.ExerciseTypeComboBox.SelectedItem).Name);
 
             timer.Tick += new EventHandler(dispatcherTimer_Tick);
             timer.Interval = new TimeSpan(0, 0, 0, 0, 20);
@@ -727,7 +726,7 @@ namespace ExercisesPerformanceControl
         private void StopBtn_Click(object sender, RoutedEventArgs e)
         {
             Written = true;
-            AmountOfFramesLabel.Content += skelListForRecording.Count.ToString();
+            //AmountOfFramesLabel.Content += skelListForRecording.Count.ToString();
             StartingFrameTextbox.Text = "0";
             EndingFrameTextbox.Text = (skelListForRecording.Count - 1).ToString();
             timer.Start();
@@ -770,13 +769,15 @@ namespace ExercisesPerformanceControl
             bitmapListForRecording.RemoveRange(end, bitmapListForRecording.Count - end);
             bitmapListForRecording.RemoveRange(0, start);
 
-            AmountOfFramesLabel.Content += skelListForRecording.Count.ToString();
+            //AmountOfFramesLabel.Content += skelListForRecording.Count.ToString();
             StartingFrameTextbox.Text = "0";
             EndingFrameTextbox.Text = (skelListForRecording.Count - 1).ToString();
             index = 0;
 
-            FileRW.WritePointsDataToFile(pointsList, fileLocation + ".pnt");
-            FileRW.WriteSkelDataToFile(skelListForRecording, fileLocation + ".txt");
+            //FileRW.WritePointsDataToFile(pointsList, fileLocation + ".pnt");
+            //FileRW.WriteSkelDataToFile(skelListForRecording, fileLocation + ".txt");
+
+            exerciseType = (ExerciseType)Enum.Parse(typeof(ExerciseType), this.ExerciseTypeComboBox.SelectedItem.ToString());
             SerializableExercise serEx = new SerializableExercise(skelListForRecording, pointsList, exerciseType);
             FileRW.WriteToFile(serEx, fileLocation + ".xrs");
 
