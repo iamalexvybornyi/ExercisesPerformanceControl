@@ -81,11 +81,6 @@ namespace ExercisesPerformanceControl
         List<JointType> listWIthCurrentlyFailedJoints = new List<JointType>();
 
         /// <summary>
-        /// Skeleton data list to record a movement
-        /// </summary>
-        private List<Skeleton> skelListForRecording = new List<Skeleton>();
-
-        /// <summary>
         /// Flag with info about whether the Silhouette data was recorded or not
         /// </summary>
         bool silWritten = false;
@@ -216,11 +211,14 @@ namespace ExercisesPerformanceControl
         DispatcherTimer timerForUserData = new DispatcherTimer();
 
         List<List<Point>> pointsList = new List<List<Point>>();
-        List<List<Point>> pointsListUser = new List<List<Point>>();
 
         static ExerciseGesture _gesture = new ExerciseGesture();
 
         int framesToShowErrors = 0;
+
+        SerializableExercise exerciseData;
+
+        ExerciseType exerciseType;
 
 
         public ExerciseControl()
@@ -311,8 +309,10 @@ namespace ExercisesPerformanceControl
 
             _gesture.GestureRecognized += Gesture_GestureRecognized;
 
+            exerciseData = FileRW.ReadFromFile(ExName);
+
             // Get all the skeleton data of an exercise
-            skelList = FileRW.ReadSkelDataFromFile(ExName);
+            skelList = exerciseData.GetSkelData();
             frames = skelList.Count;
 
             // Check if the files have been read correctly
@@ -323,7 +323,9 @@ namespace ExercisesPerformanceControl
             }
 
             pointsList.Clear();
-            pointsList = FileRW.ReadPointsDataFromFile(ExName);
+            pointsList = exerciseData.GetSkelPointsData();
+
+            exerciseType = exerciseData.GetExerciseType();
 
             timerForReferenceMovement.Tick += new EventHandler(dispatcherTimer_TickReferenceMovement);
             timerForReferenceMovement.Interval = new TimeSpan(0, 0, 0, 0, 20);
@@ -613,23 +615,9 @@ namespace ExercisesPerformanceControl
                                 skelIsTracked = true;
                             }
 
-                            List<JointType> jointsWithErrors = _gesture.Update(skel, skelList, ExerciseType.UpperBody);
+                            List<JointType> jointsWithErrors = _gesture.Update(skel, skelList, exerciseType);
 
                             this.DrawBonesAndJoints(skel, dc, jointsWithErrors);
-
-                            // All these commented lines below were used to record exercises. That's why they're still here.
-                            
-                            //Write skeleton data of an exercise to file
-                            //if (skelListForRecording.Count() < 250)
-                            //{
-                            //    skelListForRecording.Add(skel);
-                            //}
-                            //else if (Written == false)
-                            //{
-                            //    string fileLocation = "Input8.txt";
-                            //    FileRW.WriteSkelDataToFile(skelListForRecording, fileLocation);
-                            //    Written = true;
-                            //}
                             
                         }
                         else if (skel.TrackingState == SkeletonTrackingState.PositionOnly && currentlyTrackedSkeletonId == skel.TrackingId)

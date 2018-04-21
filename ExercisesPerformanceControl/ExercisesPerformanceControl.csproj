@@ -102,6 +102,7 @@
     <Compile Include="JointPositionsComparisonResult.cs" />
     <Compile Include="ExerciseGesture.cs" />
     <Compile Include="ExerciseSegment.cs" />
+    <Compile Include="SerializableExercise.cs" />
     <Compile Include="Utils.cs" />
     <Page Include="ExerciseControl.xaml">
       <SubType>Designer</SubType>

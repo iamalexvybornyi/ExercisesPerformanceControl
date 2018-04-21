@@ -205,6 +205,8 @@ namespace ExercisesPerformanceControl
         /// </summary>
         public string ExName = "";
 
+        ExerciseType exerciseType;
+
         DispatcherTimer timer = new DispatcherTimer();
 
         List<List<Point>> pointsList = new List<List<Point>>();
@@ -246,6 +248,10 @@ namespace ExercisesPerformanceControl
                     break;
                 }
             }
+
+            // Set type of the exercise
+            // TODO: get type of the exercise from UI
+            exerciseType = ExerciseType.UpperBody;
 
             timer.Tick += new EventHandler(dispatcherTimer_Tick);
             timer.Interval = new TimeSpan(0, 0, 0, 0, 20);
@@ -771,6 +777,8 @@ namespace ExercisesPerformanceControl
 
             FileRW.WritePointsDataToFile(pointsList, fileLocation + ".pnt");
             FileRW.WriteSkelDataToFile(skelListForRecording, fileLocation + ".txt");
+            SerializableExercise serEx = new SerializableExercise(skelListForRecording, pointsList, exerciseType);
+            FileRW.WriteToFile(serEx, fileLocation + ".xrs");
 
             try
             {
