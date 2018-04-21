@@ -7,6 +7,8 @@ namespace ExercisesPerformanceControl
 {
     public class ExerciseGesture
     {
+        private static bool isInProgress = false;
+
         readonly int WINDOW_SIZE = 50;
 
         IGestureSegment[] _segments;
