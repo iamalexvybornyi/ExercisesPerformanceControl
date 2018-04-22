@@ -777,7 +777,7 @@ namespace ExercisesPerformanceControl
             //FileRW.WritePointsDataToFile(pointsList, fileLocation + ".pnt");
             //FileRW.WriteSkelDataToFile(skelListForRecording, fileLocation + ".txt");
 
-            exerciseType = (ExerciseType)Enum.Parse(typeof(ExerciseType), this.ExerciseTypeComboBox.SelectedItem.ToString());
+            exerciseType = (ExerciseType)Enum.Parse(typeof(ExerciseType), ((ComboBoxItem)this.ExerciseTypeComboBox.SelectedItem).Name);
             SerializableExercise serEx = new SerializableExercise(skelListForRecording, pointsList, exerciseType);
             FileRW.WriteToFile(serEx, fileLocation + ".xrs");
 

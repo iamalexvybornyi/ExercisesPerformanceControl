@@ -9,6 +9,8 @@ namespace ExercisesPerformanceControl
     {
         readonly int WINDOW_SIZE = 50;
 
+        private static bool isInProgress = false;
+
         IGestureSegment[] _segments;
 
         int _currentSegment = 0;
@@ -54,6 +56,10 @@ namespace ExercisesPerformanceControl
                     Console.WriteLine("@@@@@@@@@@@@@@@@@=======SUCCESSFUL SEGMENT " + _currentSegment + "=======@@@@@@@@@@@@@@@@@" );
                     _currentSegment++;
                     _frameCount = 0;
+                    if (_currentSegment == 2)
+                    {
+                        isInProgress = true;
+                    }
                 }
                 else
                 {
@@ -65,7 +71,7 @@ namespace ExercisesPerformanceControl
                     }
                 }
             }
-            else if (result == GesturePartResult.Failed)
+            else if (result == GesturePartResult.Failed && isInProgress)
             {
                 Console.WriteLine("@@@@@@@@@@@@@@@@@=======WRONG MOVEMENT=======@@@@@@@@@@@@@@@@@");
                 Console.WriteLine("@@@@@@@@@@@@@@@@@=======Error in segment " + _currentSegment + "=======@@@@@@@@@@@@@@@@@");
@@ -113,7 +119,7 @@ namespace ExercisesPerformanceControl
                 }
                 Reset();
             }
-            else
+            else if (isInProgress)
             {
                 _frameCount++;
             }
@@ -128,6 +134,7 @@ namespace ExercisesPerformanceControl
         {
             _currentSegment = 0;
             _frameCount = 0;
+            isInProgress = false;
         }
     }
 }

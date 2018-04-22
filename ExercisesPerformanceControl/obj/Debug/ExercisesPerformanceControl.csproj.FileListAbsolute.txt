@@ -9,6 +9,7 @@ C:\Users\Александр\Documents\Visual Studio 2013\Projects\ExercisesPerfo
 C:\Users\Александр\Documents\Visual Studio 2013\Projects\ExercisesPerformanceControl\ExercisesPerformanceControl\bin\Debug\AForge.Video.xml
 C:\Users\Александр\Documents\Visual Studio 2013\Projects\ExercisesPerformanceControl\ExercisesPerformanceControl\bin\Debug\AForge.Video.FFMPEG.xml
 C:\Users\Александр\Documents\Visual Studio 2013\Projects\ExercisesPerformanceControl\ExercisesPerformanceControl\bin\Debug\AForge.xml
+C:\Users\Александр\Documents\Visual Studio 2013\Projects\ExercisesPerformanceControl\ExercisesPerformanceControl\obj\Debug\ExercisesPerformanceControl.csprojResolveAssemblyReference.cache
 C:\Users\Александр\Documents\Visual Studio 2013\Projects\ExercisesPerformanceControl\ExercisesPerformanceControl\obj\Debug\ExerciseControl.baml
 C:\Users\Александр\Documents\Visual Studio 2013\Projects\ExercisesPerformanceControl\ExercisesPerformanceControl\obj\Debug\ExerciseRecording.baml
 C:\Users\Александр\Documents\Visual Studio 2013\Projects\ExercisesPerformanceControl\ExercisesPerformanceControl\obj\Debug\MainWindow.baml
@@ -22,4 +23,3 @@ C:\Users\Александр\Documents\Visual Studio 2013\Projects\ExercisesPerfo
 C:\Users\Александр\Documents\Visual Studio 2013\Projects\ExercisesPerformanceControl\ExercisesPerformanceControl\obj\Debug\ExercisesPerformanceControl.csproj.GenerateResource.Cache
 C:\Users\Александр\Documents\Visual Studio 2013\Projects\ExercisesPerformanceControl\ExercisesPerformanceControl\obj\Debug\ExercisesPerformanceControl.exe
 C:\Users\Александр\Documents\Visual Studio 2013\Projects\ExercisesPerformanceControl\ExercisesPerformanceControl\obj\Debug\ExercisesPerformanceControl.pdb
-C:\Users\Александр\Documents\Visual Studio 2013\Projects\ExercisesPerformanceControl\ExercisesPerformanceControl\obj\Debug\ExercisesPerformanceControl.csprojResolveAssemblyReference.cache
