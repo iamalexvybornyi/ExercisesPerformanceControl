@@ -29,7 +29,7 @@ namespace ExercisesPerformanceControl
             InitializeComponent();
 
             // Adding exercises data from files to listBoxItem
-            string[] filePaths = Directory.GetFiles(@"ExercisesData\", "*.txt", SearchOption.TopDirectoryOnly);
+            string[] filePaths = Directory.GetFiles(@"ExercisesData\", "*.xrs", SearchOption.TopDirectoryOnly);
             foreach (var filePath in filePaths)
             {
                 ListBoxItem itm = new ListBoxItem();
