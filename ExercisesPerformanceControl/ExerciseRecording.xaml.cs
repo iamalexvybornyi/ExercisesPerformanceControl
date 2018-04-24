@@ -17,6 +17,7 @@ using System.Windows.Shapes;
 using System.Windows.Threading;
 using Microsoft.Kinect.Toolkit.BackgroundRemoval;
 using AForge.Video.FFMPEG;
+using System.Text.RegularExpressions;
 
 namespace ExercisesPerformanceControl
 {
@@ -324,7 +325,6 @@ namespace ExercisesPerformanceControl
                 this.sensor.SkeletonStream.Disable();
 
                 this.sensor.Stop();
-                int qwe = 4;
             }
         }
 
@@ -735,9 +735,20 @@ namespace ExercisesPerformanceControl
             this.OkBtn.IsEnabled = true;
             this.SaveBtn.IsEnabled = true;
 
-            if (skelListForRecording.Count == bitmapListForRecording.Count)
+            if (((skelListForRecording.Count - bitmapListForRecording.Count) <= 5) && skelListForRecording.Count >= 30)
             {
                 Written = true;
+                int bitmapFrames = bitmapListForRecording.Count;
+                int skelFrames = skelListForRecording.Count;
+
+                if (skelFrames > bitmapFrames)
+                {
+                    skelListForRecording.RemoveRange(bitmapFrames - 1, (skelFrames - 1) - (bitmapFrames - 1));
+                }
+                else if (bitmapFrames > skelFrames)
+                {
+                    bitmapListForRecording.RemoveRange(skelFrames - 1, (bitmapFrames - 1) - (skelFrames - 1));
+                }
                 //AmountOfFramesLabel.Content += skelListForRecording.Count.ToString();
                 StartingFrameTextbox.Text = "0";
                 EndingFrameTextbox.Text = (skelListForRecording.Count - 1).ToString();
@@ -766,6 +777,10 @@ namespace ExercisesPerformanceControl
                 pointsList.Clear();
                 bitmapListForRecording.Clear();
                 Written = false;
+                this.StopBtn.IsEnabled = false;
+                this.StartBtn.IsEnabled = true;
+                this.OkBtn.IsEnabled = false;
+                this.SaveBtn.IsEnabled = false;
             }
         }
 
@@ -781,75 +796,144 @@ namespace ExercisesPerformanceControl
             int start = Convert.ToInt16(StartingFrameTextbox.Text);
             int end = Convert.ToInt16(EndingFrameTextbox.Text);
 
-            skelListForRecording.RemoveRange(end, skelListForRecording.Count - end);
-            skelListForRecording.RemoveRange(0, start);
-
-            pointsList.RemoveRange(end, pointsList.Count - end);
-            pointsList.RemoveRange(0, start);
-
-            bitmapListForRecording.RemoveRange(end, bitmapListForRecording.Count - end);
-            bitmapListForRecording.RemoveRange(0, start);
-
-            //AmountOfFramesLabel.Content += skelListForRecording.Count.ToString();
-            StartingFrameTextbox.Text = "0";
-            EndingFrameTextbox.Text = (skelListForRecording.Count - 1).ToString();
-            index = 0;
-
-            //FileRW.WritePointsDataToFile(pointsList, fileLocation + ".pnt");
-            //FileRW.WriteSkelDataToFile(skelListForRecording, fileLocation + ".txt");
-
-            exerciseType = (ExerciseType)Enum.Parse(typeof(ExerciseType), ((ComboBoxItem)this.ExerciseTypeComboBox.SelectedItem).Name);
-            SerializableExercise serEx = new SerializableExercise(skelListForRecording, pointsList, exerciseType);
-            FileRW.WriteToFile(serEx, fileLocation + ".xrs");
-
-            try
+            if (end - start >= 30)
             {
-                int counter = 0;
-                foreach (var backRemovedFrame in bitmapListForRecording)
-                {
-                    WriteableBitmap tmpBitmap = new WriteableBitmap(backRemovedFrame.width, backRemovedFrame.height, 96.0, 96.0, PixelFormats.Bgra32, null);
-                    tmpBitmap.WritePixels(
-                            new Int32Rect(0, 0, tmpBitmap.PixelWidth, tmpBitmap.PixelHeight),
-                            backRemovedFrame.pixelData,
-                            tmpBitmap.PixelWidth * sizeof(int),
-                            0);
+                skelListForRecording.RemoveRange(end, skelListForRecording.Count - end);
+                skelListForRecording.RemoveRange(0, start);
 
-                    Utils.CreateThumbnailPNG(@"ExercisesData\Pics\" + NameOfTheExTextbox.Text + counter.ToString() + ".png", tmpBitmap);
-                    counter++;
-                }
+                pointsList.RemoveRange(end, pointsList.Count - end);
+                pointsList.RemoveRange(0, start);
 
-                using (VideoFileWriter writer = new VideoFileWriter())
+                bitmapListForRecording.RemoveRange(end, bitmapListForRecording.Count - end);
+                bitmapListForRecording.RemoveRange(0, start);
+
+                //AmountOfFramesLabel.Content += skelListForRecording.Count.ToString();
+                StartingFrameTextbox.Text = "0";
+                EndingFrameTextbox.Text = (skelListForRecording.Count - 1).ToString();
+                index = 0;
+
+                //FileRW.WritePointsDataToFile(pointsList, fileLocation + ".pnt");
+                //FileRW.WriteSkelDataToFile(skelListForRecording, fileLocation + ".txt");
+
+                exerciseType = (ExerciseType)Enum.Parse(typeof(ExerciseType), ((ComboBoxItem)this.ExerciseTypeComboBox.SelectedItem).Name);
+                SerializableExercise serEx = new SerializableExercise(skelListForRecording, pointsList, exerciseType);
+                FileRW.WriteToFile(serEx, fileLocation + ".xrs");
+
+                try
                 {
-                    writer.Open(fileLocation + ".avi", 640, 480, 30, VideoCodec.MPEG4);
-                    var files = new DirectoryInfo(@"ExercisesData\Pics").GetFiles().OrderBy(f => f.LastWriteTime).ToList();
-                    foreach (var file in files)
+                    int counter = 0;
+                    foreach (var backRemovedFrame in bitmapListForRecording)
                     {
-                        var bitmap = System.Drawing.Bitmap.FromFile(file.FullName) as System.Drawing.Bitmap;
-                        bitmap.MakeTransparent(bitmap.GetPixel(0, 0));
-                        writer.WriteVideoFrame(bitmap);
+                        WriteableBitmap tmpBitmap = new WriteableBitmap(backRemovedFrame.width, backRemovedFrame.height, 96.0, 96.0, PixelFormats.Bgra32, null);
+                        tmpBitmap.WritePixels(
+                                new Int32Rect(0, 0, tmpBitmap.PixelWidth, tmpBitmap.PixelHeight),
+                                backRemovedFrame.pixelData,
+                                tmpBitmap.PixelWidth * sizeof(int),
+                                0);
+
+                        Utils.CreateThumbnailPNG(@"ExercisesData\Pics\" + NameOfTheExTextbox.Text + counter.ToString() + ".png", tmpBitmap);
+                        counter++;
                     }
-                    writer.Close();
+
+                    using (VideoFileWriter writer = new VideoFileWriter())
+                    {
+                        writer.Open(fileLocation + ".avi", 640, 480, 30, VideoCodec.MPEG4);
+                        var files = new DirectoryInfo(@"ExercisesData\Pics").GetFiles().OrderBy(f => f.LastWriteTime).ToList();
+                        foreach (var file in files)
+                        {
+                            var bitmap = System.Drawing.Bitmap.FromFile(file.FullName) as System.Drawing.Bitmap;
+                            bitmap.MakeTransparent(bitmap.GetPixel(0, 0));
+                            writer.WriteVideoFrame(bitmap);
+                        }
+                        writer.Close();
+                    }
                 }
-            }
-            catch
-            {
-                MessageBox.Show("Видео не было сохранено!");
-            }
-
-            timer.Stop();
-            this.Close();
-
-            System.GC.Collect();
-            System.GC.WaitForPendingFinalizers(); 
-            try
-            {
-                System.IO.DirectoryInfo di = new DirectoryInfo(@"ExercisesData\Pics");
-                foreach (FileInfo file in di.GetFiles())
+                catch
                 {
-                    file.Delete();
+                    MessageBox.Show("Видео не было сохранено!");
+                }
+
+                timer.Stop();
+                this.Close();
+
+                System.GC.Collect();
+                System.GC.WaitForPendingFinalizers();
+                try
+                {
+                    System.IO.DirectoryInfo di = new DirectoryInfo(@"ExercisesData\Pics");
+                    foreach (FileInfo file in di.GetFiles())
+                    {
+                        file.Delete();
+                    }
+                }
+                catch { }
+            }
+            else
+            {
+                MessageBox.Show("Количество кадров в упражнении слишком маленькое, попробуйте еще раз.");
+                this.StopBtn.IsEnabled = false;
+                this.StartBtn.IsEnabled = true;
+                this.OkBtn.IsEnabled = false;
+                this.SaveBtn.IsEnabled = false;
+                skelListForRecording.Clear();
+                pointsList.Clear();
+                bitmapListForRecording.Clear();
+                Written = false;
+                timer.Stop();
+                // Look through all Kinect sensors and start the first connected one.
+                foreach (var potentialSensor in KinectSensor.KinectSensors)
+                {
+                    if (potentialSensor.Status == KinectStatus.Connected)
+                    {
+                        this.sensor = potentialSensor;
+                        break;
+                    }
+                }
+
+                // Set type of the exercise
+                exerciseType = (ExerciseType)Enum.Parse(typeof(ExerciseType), ((ComboBoxItem)this.ExerciseTypeComboBox.SelectedItem).Name);
+
+                timer.Tick += new EventHandler(dispatcherTimer_Tick);
+                timer.Interval = new TimeSpan(0, 0, 0, 0, 20);
+
+                if (null != this.sensor)
+                {
+                    // Turn on the skeleton stream to receive skeleton frames
+                    this.sensor.SkeletonStream.Enable();
+
+                    // Add an event handlers
+                    this.sensor.SkeletonFrameReady += this.SensorSkeletonFrameReady;
+                    this.sensor.AllFramesReady += this.SensorAllFramesReady;
+
+                    // Turn on the depth stream
+                    this.sensor.DepthStream.Enable(DepthImageFormat.Resolution320x240Fps30);
+
+                    // Turn on the color stream
+                    this.sensor.ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30);
+
+                    // Turn on the backgroundRemoved color stream
+                    this.backgroundRemovedColorStream = new BackgroundRemovedColorStream(this.sensor);
+                    this.backgroundRemovedColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30, DepthImageFormat.Resolution320x240Fps30);
+
+                    // Allocate space to put the depth, color, and skeleton data we'll receive
+                    if (null == this.skeletons)
+                    {
+                        this.skeletons = new Skeleton[this.sensor.SkeletonStream.FrameSkeletonArrayLength];
+                    }
+
+                    this.backgroundRemovedColorStream.BackgroundRemovedFrameReady += this.BackgroundRemovedFrameReadyHandler;
+
+                    // Start the sensor!
+                    try
+                    {
+                        this.sensor.Start();
+                    }
+                    catch (IOException)
+                    {
+                        this.sensor = null;
+                    }
                 }
             }
-            catch { }
         }
 
         private void dispatcherTimer_Tick(object sender, EventArgs e)
@@ -873,6 +957,16 @@ namespace ExercisesPerformanceControl
                         if (index >= Convert.ToInt16(EndingFrameTextbox.Text))
                         {
                             index = Convert.ToInt16(StartingFrameTextbox.Text);
+                            if (index >= endingFrame)
+                            {
+                                index = 0;
+                                StartingFrameTextbox.Text = index.ToString();
+                            }
+                        }
+
+                        if (endingFrame > bitmapListForRecording.Count())
+                        {
+                            EndingFrameTextbox.Text = bitmapListForRecording.Count().ToString();
                         }
                     }
                     catch
@@ -999,6 +1093,12 @@ namespace ExercisesPerformanceControl
         private void WindowClosed(object sender, EventArgs e)
         {
             this.Close();
+        }
+
+        private void NumberValidationTextBox(object sender, TextCompositionEventArgs e)
+        {
+            Regex regex = new Regex("[^0-9]+");
+            e.Handled = regex.IsMatch(e.Text);
         }
     }
 }

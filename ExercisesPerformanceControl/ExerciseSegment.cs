@@ -25,7 +25,7 @@ namespace ExercisesPerformanceControl
     public class Helper
     {
         public static double err = 0.1;
-        public static int error = 20;
+        public static int error = 15;
     }
 
     public class ExerciseSegment : IGestureSegment
