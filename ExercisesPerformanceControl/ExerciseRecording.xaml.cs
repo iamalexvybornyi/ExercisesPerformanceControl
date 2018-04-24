@@ -223,6 +223,9 @@ namespace ExercisesPerformanceControl
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            this.OkBtn.IsEnabled = false;
+            this.SaveBtn.IsEnabled = false;
+            this.StopBtn.IsEnabled = false;
             // Create the drawing group we'll use for drawing live data
             this.drawingGroupForLiveData = new DrawingGroup();
 
@@ -310,18 +313,18 @@ namespace ExercisesPerformanceControl
             // Disable all the streams and event handlers
             if (null != this.sensor)
             {
-                this.backgroundRemovedColorStream.Disable();
-                this.backgroundRemovedColorStream.BackgroundRemovedFrameReady -= this.BackgroundRemovedFrameReadyHandler;
-                this.backgroundRemovedColorStream.Dispose();
-                this.backgroundRemovedColorStream = null;
-
                 this.sensor.AllFramesReady -= this.SensorAllFramesReady;
                 this.sensor.SkeletonFrameReady -= this.SensorSkeletonFrameReady;
+                this.backgroundRemovedColorStream.BackgroundRemovedFrameReady -= this.BackgroundRemovedFrameReadyHandler;
+                this.backgroundRemovedColorStream.Disable();
+                this.backgroundRemovedColorStream.Dispose();
+                this.backgroundRemovedColorStream = null;
                 this.sensor.DepthStream.Disable();
                 this.sensor.ColorStream.Disable();
                 this.sensor.SkeletonStream.Disable();
 
                 this.sensor.Stop();
+                int qwe = 4;
             }
         }
 
@@ -720,31 +723,49 @@ namespace ExercisesPerformanceControl
 
         private void StartBtn_Click(object sender, RoutedEventArgs e)
         {
+            this.StopBtn.IsEnabled = true;
+            this.StartBtn.IsEnabled = false;
             Written = false;
         }
 
         private void StopBtn_Click(object sender, RoutedEventArgs e)
         {
-            Written = true;
-            //AmountOfFramesLabel.Content += skelListForRecording.Count.ToString();
-            StartingFrameTextbox.Text = "0";
-            EndingFrameTextbox.Text = (skelListForRecording.Count - 1).ToString();
-            timer.Start();
+            this.StopBtn.IsEnabled = false;
+            this.StartBtn.IsEnabled = false;
+            this.OkBtn.IsEnabled = true;
+            this.SaveBtn.IsEnabled = true;
 
-            if (null != this.sensor)
+            if (skelListForRecording.Count == bitmapListForRecording.Count)
             {
-                //this.backgroundRemovedColorStream.Disable();
-                //this.backgroundRemovedColorStream.BackgroundRemovedFrameReady -= this.BackgroundRemovedFrameReadyHandler;
-                //this.backgroundRemovedColorStream.Dispose();
-                //this.backgroundRemovedColorStream = null;
+                Written = true;
+                //AmountOfFramesLabel.Content += skelListForRecording.Count.ToString();
+                StartingFrameTextbox.Text = "0";
+                EndingFrameTextbox.Text = (skelListForRecording.Count - 1).ToString();
+                timer.Start();
 
-                //this.sensor.AllFramesReady -= this.SensorAllFramesReady;
-                //this.sensor.SkeletonFrameReady -= this.SensorSkeletonFrameReady;
-                //this.sensor.DepthStream.Disable();
-                //this.sensor.ColorStream.Disable();
-                //this.sensor.SkeletonStream.Disable();
+                if (null != this.sensor)
+                {
+                    //this.backgroundRemovedColorStream.Disable();
+                    //this.backgroundRemovedColorStream.BackgroundRemovedFrameReady -= this.BackgroundRemovedFrameReadyHandler;
+                    //this.backgroundRemovedColorStream.Dispose();
+                    //this.backgroundRemovedColorStream = null;
 
-                this.sensor.Stop();
+                    //this.sensor.AllFramesReady -= this.SensorAllFramesReady;
+                    //this.sensor.SkeletonFrameReady -= this.SensorSkeletonFrameReady;
+                    //this.sensor.DepthStream.Disable();
+                    //this.sensor.ColorStream.Disable();
+                    //this.sensor.SkeletonStream.Disable();
+
+                    this.sensor.Stop();
+                }
+            }
+            else
+            {
+                MessageBox.Show("При записи произошел сбой, попробуйте еще раз.");
+                skelListForRecording.Clear();
+                pointsList.Clear();
+                bitmapListForRecording.Clear();
+                Written = false;
             }
         }
 
@@ -973,6 +994,11 @@ namespace ExercisesPerformanceControl
             }
 
             drawingContext.DrawLine(drawPen, pointsList[index][joint0Index], pointsList[index][joint1Index]);
+        }
+
+        private void WindowClosed(object sender, EventArgs e)
+        {
+            this.Close();
         }
     }
 }

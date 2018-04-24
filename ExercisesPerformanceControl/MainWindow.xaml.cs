@@ -40,10 +40,17 @@ namespace ExercisesPerformanceControl
 
         private void ChooseExBtn_Click(object sender, RoutedEventArgs e)
         {
-            ExerciseControl page = new ExerciseControl();
             dynamic tmp = this.ListOfExrcs.SelectedItem;
-            page.ExName = tmp.Content;
-            page.ShowDialog();
+            if (tmp != null)
+            {
+                ExerciseControl page = new ExerciseControl();
+                page.ExName = tmp.Content;
+                page.ShowDialog();
+            }
+            else
+            {
+                MessageBox.Show("Выберите упражнение!");
+            }
         }
 
         private void RecExBtn_Click(object sender, RoutedEventArgs e)
