@@ -26,197 +26,6 @@ namespace ExercisesPerformanceControl
     /// </summary>
     public partial class ExerciseRecording : Window
     {
-        /// <summary>
-        /// Intermediate storage for the skeleton data received from the sensor
-        /// </summary>
-        private Skeleton[] skeletons;
-
-        /// <summary>
-        /// Id of the currently tracked skeleton
-        /// </summary>
-        private int currentlyTrackedSkeletonId;
-
-        /// <summary>
-        /// Bitmap that will hold color information
-        /// </summary>
-        private WriteableBitmap foregroundBitmap;
-
-        /// <summary>
-        /// Bitmap that will hold color information
-        /// </summary>
-        private WriteableBitmap colorBitmap;
-
-
-        /// <summary>
-        /// Flag with info about whether the skeleton is tracked or not
-        /// </summary>
-        bool skelIsTracked = false;
-
-        /// <summary>
-        /// Intermediate storage for the color data received from the camera
-        /// </summary>
-        private byte[] colorPixels;
-
-        /// <summary>
-        /// Name of an exercise
-        /// </summary>
-        public string ExText = "";
-
-        /// <summary>
-        /// List for skeleton data
-        /// </summary>
-        private List<Skeleton> skelList = new List<Skeleton>();
-
-        private List<Skeleton> skelListUser = new List<Skeleton>();
-
-        /// <summary>
-        /// Skeleton data list to record a movement
-        /// </summary>
-        private List<Skeleton> skelListForRecording = new List<Skeleton>();
-
-        /// <summary>
-        /// Skeleton data list to record a movement
-        /// </summary>
-        private List<MyBackgroundRemovedColourFrame> bitmapListForRecording = new List<MyBackgroundRemovedColourFrame>();
-
-        /// <summary>
-        /// Flag with info about whether the Silhouette data was recorded or not
-        /// </summary>
-        bool silWritten = false;
-
-        /// <summary>
-        /// Foreground bitmap for recorded data
-        /// </summary>
-        private WriteableBitmap foregroundBitmapForRec;
-
-        /// <summary>
-        /// List for angles
-        /// </summary>
-        private List<List<double>> anglesLists = new List<List<double>>();
-
-        /// <summary>
-        /// Amount of counted reps
-        /// </summary>
-        int numberOfReps = 0;
-
-        /// <summary>
-        /// Flag with an info about whether recording was finished or not
-        /// </summary>
-        private bool Written = true;
-
-        /// <summary>
-        /// Index of the exercise's current frame
-        /// </summary>
-        int index = 0;
-        int indexUserData = 0;
-
-        /// <summary>
-        /// Total amount of frames in the exercise
-        /// </summary>
-        public int frames = 149;
-        public int framesUserData = 150;
-
-        /// <summary>
-        /// Width of output drawing
-        /// </summary>
-        private const float RenderWidth = 640.0f;
-
-        /// <summary>
-        /// Height of our output drawing
-        /// </summary>
-        private const float RenderHeight = 480.0f;
-
-        /// <summary>
-        /// Thickness of drawn joint lines
-        /// </summary>
-        private double JointThickness = 3;
-
-        /// <summary>
-        /// Thickness of body center ellipse
-        /// </summary>
-        private const double BodyCenterThickness = 10;
-
-        /// <summary>
-        /// Thickness of clip edge rectangles
-        /// </summary>
-        private const double ClipBoundsThickness = 10;
-
-        /// <summary>
-        /// Brush used to draw skeleton center point
-        /// </summary>
-        private readonly Brush centerPointBrush = Brushes.Blue;
-
-        /// <summary>
-        /// Brush used for drawing joints that are currently tracked
-        /// </summary>
-        private readonly Brush trackedJointBrush = new SolidColorBrush(Color.FromArgb(255, 68, 192, 68));
-
-        /// <summary>
-        /// Brush used for drawing joints that are currently inferred
-        /// </summary>        
-        private readonly Brush inferredJointBrush = Brushes.Yellow;
-
-        /// <summary>
-        /// Pen used for drawing bones that are currently tracked
-        /// </summary>
-        private readonly Pen trackedBonePen = new Pen(Brushes.Green, 10);
-
-        /// <summary>
-        /// Pen used for drawing bones that are currently inferred
-        /// </summary>        
-        private readonly Pen inferredBonePen = new Pen(Brushes.Gray, 10);
-
-        /// <summary>
-        /// Active Kinect sensor
-        /// </summary>
-        private KinectSensor sensor;
-
-        /// <summary>
-        /// Drawing group for skeleton live data
-        /// </summary>
-        private DrawingGroup drawingGroupForLiveData;
-
-        /// <summary>
-        /// Drawing group for skeleton recorded data
-        /// </summary>
-        private DrawingGroup drawingGroupForRecordedData;
-
-        /// <summary>
-        /// Drawing image that we will display for live data
-        /// </summary>
-        private DrawingImage imageSourceForLiveData;
-
-        /// <summary>
-        /// Drawing image that we will display for recorded data
-        /// </summary>
-        private DrawingImage imageSourceForRecordedData;
-
-        /// <summary>
-        /// Library which does background 
-        /// </summary>
-        private BackgroundRemovedColorStream backgroundRemovedColorStream;
-
-        /// <summary>
-        /// Track whether Dispose has been called
-        /// </summary>
-        private bool disposed;
-
-        /// <summary>
-        /// Var for the name of the exercise
-        /// </summary>
-        public string ExName = "";
-
-        ExerciseType exerciseType;
-
-        DispatcherTimer timer = new DispatcherTimer();
-
-        List<List<Point>> pointsList = new List<List<Point>>();
-        List<List<Point>> pointsListUser = new List<List<Point>>();
-
-        static ExerciseGesture _gesture = new ExerciseGesture();
-
-
-
         public ExerciseRecording()
         {
             InitializeComponent();
@@ -397,12 +206,7 @@ namespace ExercisesPerformanceControl
 
                     if (Written == false && (this.skeletons.Any(skel => skel.TrackingState == SkeletonTrackingState.Tracked)))
                     {
-                        MyBackgroundRemovedColourFrame MyFrame = new MyBackgroundRemovedColourFrame(backgroundRemovedFrame);
-                        byte[] tmpPixelData = new byte[backgroundRemovedFrame.GetRawPixelData().Length];
-                        MyFrame.height = backgroundRemovedFrame.Height;
-                        MyFrame.width = backgroundRemovedFrame.Width;
-                        backgroundRemovedFrame.GetRawPixelData().CopyTo(MyFrame.pixelData, 0);
-                        bitmapListForRecording.Add(MyFrame);
+                        bitmapListForRecording.Add(Utils.GetWriteableBackgroundRemovedFrame(backgroundRemovedFrame));
                     }
                 }
             }
@@ -749,24 +553,13 @@ namespace ExercisesPerformanceControl
                 {
                     bitmapListForRecording.RemoveRange(skelFrames - 1, (bitmapFrames - 1) - (skelFrames - 1));
                 }
-                //AmountOfFramesLabel.Content += skelListForRecording.Count.ToString();
+
                 StartingFrameTextbox.Text = "0";
                 EndingFrameTextbox.Text = (skelListForRecording.Count - 1).ToString();
                 timer.Start();
 
                 if (null != this.sensor)
                 {
-                    //this.backgroundRemovedColorStream.Disable();
-                    //this.backgroundRemovedColorStream.BackgroundRemovedFrameReady -= this.BackgroundRemovedFrameReadyHandler;
-                    //this.backgroundRemovedColorStream.Dispose();
-                    //this.backgroundRemovedColorStream = null;
-
-                    //this.sensor.AllFramesReady -= this.SensorAllFramesReady;
-                    //this.sensor.SkeletonFrameReady -= this.SensorSkeletonFrameReady;
-                    //this.sensor.DepthStream.Disable();
-                    //this.sensor.ColorStream.Disable();
-                    //this.sensor.SkeletonStream.Disable();
-
                     this.sensor.Stop();
                 }
             }
@@ -807,13 +600,9 @@ namespace ExercisesPerformanceControl
                 bitmapListForRecording.RemoveRange(end, bitmapListForRecording.Count - end);
                 bitmapListForRecording.RemoveRange(0, start);
 
-                //AmountOfFramesLabel.Content += skelListForRecording.Count.ToString();
                 StartingFrameTextbox.Text = "0";
                 EndingFrameTextbox.Text = (skelListForRecording.Count - 1).ToString();
                 index = 0;
-
-                //FileRW.WritePointsDataToFile(pointsList, fileLocation + ".pnt");
-                //FileRW.WriteSkelDataToFile(skelListForRecording, fileLocation + ".txt");
 
                 exerciseType = (ExerciseType)Enum.Parse(typeof(ExerciseType), ((ComboBoxItem)this.ExerciseTypeComboBox.SelectedItem).Name);
                 SerializableExercise serEx = new SerializableExercise(skelListForRecording, pointsList, exerciseType);
@@ -821,32 +610,7 @@ namespace ExercisesPerformanceControl
 
                 try
                 {
-                    int counter = 0;
-                    foreach (var backRemovedFrame in bitmapListForRecording)
-                    {
-                        WriteableBitmap tmpBitmap = new WriteableBitmap(backRemovedFrame.width, backRemovedFrame.height, 96.0, 96.0, PixelFormats.Bgra32, null);
-                        tmpBitmap.WritePixels(
-                                new Int32Rect(0, 0, tmpBitmap.PixelWidth, tmpBitmap.PixelHeight),
-                                backRemovedFrame.pixelData,
-                                tmpBitmap.PixelWidth * sizeof(int),
-                                0);
-
-                        Utils.CreateThumbnailPNG(@"ExercisesData\Pics\" + NameOfTheExTextbox.Text + counter.ToString() + ".png", tmpBitmap);
-                        counter++;
-                    }
-
-                    using (VideoFileWriter writer = new VideoFileWriter())
-                    {
-                        writer.Open(fileLocation + ".avi", 640, 480, 30, VideoCodec.MPEG4);
-                        var files = new DirectoryInfo(@"ExercisesData\Pics").GetFiles().OrderBy(f => f.LastWriteTime).ToList();
-                        foreach (var file in files)
-                        {
-                            var bitmap = System.Drawing.Bitmap.FromFile(file.FullName) as System.Drawing.Bitmap;
-                            bitmap.MakeTransparent(bitmap.GetPixel(0, 0));
-                            writer.WriteVideoFrame(bitmap);
-                        }
-                        writer.Close();
-                    }
+                    FileRW.WriteToVideoFile(fileLocation, NameOfTheExTextbox.Text, bitmapListForRecording);
                 }
                 catch
                 {

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Kinect.Toolkit.BackgroundRemoval;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -10,7 +11,7 @@ using System.Windows.Media.Imaging;
 
 namespace ExercisesPerformanceControl
 {
-    class Utils
+    public static class Utils
     {
         public static System.Drawing.Bitmap BitmapFromWriteableBitmap(WriteableBitmap writeBmp)
         {
@@ -60,6 +61,17 @@ namespace ExercisesPerformanceControl
                     encoder5.Save(stream5);
                 }
             }
+        }
+
+        public static MyBackgroundRemovedColourFrame GetWriteableBackgroundRemovedFrame(BackgroundRemovedColorFrame inputFrame)
+        {
+            MyBackgroundRemovedColourFrame myFrame = new MyBackgroundRemovedColourFrame(inputFrame);
+            byte[] tmpPixelData = new byte[inputFrame.GetRawPixelData().Length];
+            myFrame.height = inputFrame.Height;
+            myFrame.width = inputFrame.Width;
+            inputFrame.GetRawPixelData().CopyTo(myFrame.pixelData, 0);
+
+            return myFrame;
         }
     }
 }

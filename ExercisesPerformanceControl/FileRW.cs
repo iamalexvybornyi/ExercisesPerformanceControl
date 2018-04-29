@@ -17,6 +17,7 @@ using Microsoft.Kinect.Toolkit.BackgroundRemoval;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows;
+using AForge.Video.FFMPEG;
 
 namespace ExercisesPerformanceControl
 {
@@ -177,6 +178,36 @@ namespace ExercisesPerformanceControl
             }
 
             return Motion;
+        }
+
+        public static void WriteToVideoFile(String exerciseName, String fileLocation, List<MyBackgroundRemovedColourFrame> listForRecording)
+        {
+            int counter = 0;
+            foreach (var backRemovedFrame in listForRecording)
+            {
+                WriteableBitmap tmpBitmap = new WriteableBitmap(backRemovedFrame.width, backRemovedFrame.height, 96.0, 96.0, PixelFormats.Bgra32, null);
+                tmpBitmap.WritePixels(
+                        new Int32Rect(0, 0, tmpBitmap.PixelWidth, tmpBitmap.PixelHeight),
+                        backRemovedFrame.pixelData,
+                        tmpBitmap.PixelWidth * sizeof(int),
+                        0);
+
+                Utils.CreateThumbnailPNG(@"ExercisesData\Pics\" + exerciseName + counter.ToString() + ".png", tmpBitmap);
+                counter++;
+            }
+
+            using (VideoFileWriter writer = new VideoFileWriter())
+            {
+                writer.Open(fileLocation + ".avi", 640, 480, 30, VideoCodec.MPEG4);
+                var files = new DirectoryInfo(@"ExercisesData\Pics").GetFiles().OrderBy(f => f.LastWriteTime).ToList();
+                foreach (var file in files)
+                {
+                    var bitmap = System.Drawing.Bitmap.FromFile(file.FullName) as System.Drawing.Bitmap;
+                    bitmap.MakeTransparent(bitmap.GetPixel(0, 0));
+                    writer.WriteVideoFrame(bitmap);
+                }
+                writer.Close();
+            }
         }
 
         /*
